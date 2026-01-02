@@ -1,5 +1,5 @@
 <script setup>
-import avatarUrl from "../assets/pfp_optimized.gif";
+import avatarUrl from "../assets/pfp.webp";
 </script>
 
 <template>
