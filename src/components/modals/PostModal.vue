@@ -1,4 +1,6 @@
 <script setup>
+import { getRelativeTime } from "../../utils/time";
+
 defineProps({
     post: {
         type: Object,
