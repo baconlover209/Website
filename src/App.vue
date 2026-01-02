@@ -12,6 +12,21 @@ const GallerySection = defineAsyncComponent(() =>
 );
 
 const navLinks = ["Home", "Projects", "Gallery", "Comms"];
+
+import { onMounted, onUnmounted } from 'vue';
+
+function updateMouse(e) {
+  document.documentElement.style.setProperty('--mx', `${e.clientX}px`);
+  document.documentElement.style.setProperty('--my', `${e.clientY}px`);
+}
+
+onMounted(() => {
+  window.addEventListener('mousemove', updateMouse);
+});
+
+onUnmounted(() => {
+  window.removeEventListener('mousemove', updateMouse);
+});
 </script>
 
 <template>
@@ -58,6 +73,51 @@ body {
   font-family: "Outfit", sans-serif;
   overflow: hidden;
 }
+
+@property --x {
+  syntax: '<length-percentage>';
+  initial-value: 50vw;
+  inherits: true;
+}
+
+@property --y {
+  syntax: '<length-percentage>';
+  initial-value: 50vh;
+  inherits: true;
+}
+
+@property --mx {
+  syntax: '<length-percentage>';
+  initial-value: 50vw;
+  inherits: true;
+}
+
+@property --my {
+  syntax: '<length-percentage>';
+  initial-value: 50vh;
+  inherits: true;
+}
+
+@property --ix {
+  syntax: '<length-percentage>';
+  initial-value: 50%;
+  inherits: true;
+}
+
+@property --iy {
+  syntax: '<length-percentage>';
+  initial-value: 50%;
+  inherits: true;
+}
+
+@keyframes drift {
+  0% { --ix: 20%; --iy: 20%; }
+  30% { --ix: 80%; --iy: 20%; }
+  60% { --ix: 50%; --iy: 80%; }
+  100% { --ix: 20%; --iy: 20%; }
+}
+
+
 
 .app-layout {
   display: flex;
@@ -128,8 +188,44 @@ body {
 
 .sidebar-header {
   background: #06b6d4;
+  transition: .35s cubic-bezier(.1,0,.5,1.5);
+  transition-property: --x, --y;
   padding: 2rem;
   border-bottom: 4px solid black;
+  position: relative;
+  overflow: hidden;
+  
+  animation: drift 10s infinite ease-in-out;
+  --x: var(--ix);
+  --y: var(--iy);
+}
+
+.sidebar-header:hover {
+  --x: var(--mx);
+  --y: var(--my);
+}
+
+.sidebar-header::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  
+  --pattern: radial-gradient(closest-side, #777, #fff) 0/ 1em 1em space;
+  --map: radial-gradient(circle farthest-corner at var(--x) var(--y), #888, #fff);
+  
+  background: var(--pattern), var(--map);
+  background-blend-mode: multiply;
+  
+  mix-blend-mode: screen;
+  filter: contrast(16) invert(1);
+  opacity: 0.6;
+}
+
+.sidebar-header > * {
+  position: relative;
+  z-index: 1;
 }
 
 .sidebar-body {
