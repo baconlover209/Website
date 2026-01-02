@@ -128,17 +128,17 @@ const closePost = () => {
   display: flex;
   gap: 0.5rem;
   flex-wrap: wrap;
-  border-bottom: 2px solid #e2e8f0;
+  border-bottom: 2px solid var(--text-dim);
   padding-bottom: 1.5rem;
 }
 
 .nav-link {
-  color: #0f172a;
+  color: var(--text-primary);
   text-decoration: none;
   font-weight: 700;
   text-transform: uppercase;
   font-size: 0.8rem;
-  background: #f1f5f9;
+  background: var(--bg-card-alt);
   padding: 0.5rem 1rem;
   border-radius: 8px;
   transition: all 0.2s;
@@ -146,23 +146,23 @@ const closePost = () => {
 }
 
 .nav-link:hover {
-  background: #06b6d4;
+  background: var(--accent);
   color: white;
   transform: translateY(-2px);
-  box-shadow: 0 4px 6px -1px rgba(6, 182, 212, 0.2);
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.2);
 }
 
 .section-label {
   font-family: "Outfit", sans-serif;
   font-weight: 800;
   font-size: 2rem;
-  color: #0f172a;
+  color: var(--text-primary);
   margin-bottom: 0.5rem;
   text-transform: uppercase;
 }
 
 .bio-text {
-  color: #334155;
+  color: var(--text-secondary);
   line-height: 1.6;
   font-size: 1.1rem;
   font-weight: 500;
@@ -186,12 +186,12 @@ const closePost = () => {
 .blog-line {
   flex: 1;
   height: 2px;
-  background: #f1f5f9;
+  background: var(--bg-card-alt);
 }
 
 .blog-entry {
-  background: #f8fafc;
-  border: 2px solid #e2e8f0;
+  background: var(--bg-card);
+  border: 2px solid var(--border-color);
   border-radius: 12px;
   padding: 1.5rem;
   transition: all 0.2s;
@@ -199,10 +199,10 @@ const closePost = () => {
 }
 
 .blog-entry:hover {
-  border-color: #06b6d4;
-  background: white;
+  border-color: var(--accent);
+  background: var(--bg-card-alt);
   transform: translateX(4px);
-  box-shadow: -4px 4px 0px 0px #06b6d4;
+  box-shadow: -4px 4px 0px 0px var(--accent);
 }
 
 .entry-meta {
@@ -225,7 +225,7 @@ const closePost = () => {
 .entry-text {
   font-size: 1.25rem;
   font-weight: 600;
-  color: #0f172a;
+  color: var(--text-primary);
   margin-bottom: 1.5rem;
   line-height: 1.4;
 }
@@ -233,7 +233,7 @@ const closePost = () => {
 .entry-actions {
   display: flex;
   gap: 1.5rem;
-  border-top: 1px solid #e2e8f0;
+  border-top: 1px solid var(--text-dim);
   padding-top: 1rem;
 }
 
@@ -248,6 +248,6 @@ const closePost = () => {
 }
 
 .action-btn:hover {
-  color: #06b6d4;
+  color: var(--accent);
 }
 </style>

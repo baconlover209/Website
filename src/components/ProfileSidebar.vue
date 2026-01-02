@@ -48,8 +48,8 @@ function handleMouseMove(e) {
   width: 150px;
   height: 150px;
   border-radius: 50%;
-  border: 6px solid white;
-  background: white;
+  border: 6px solid var(--bg-card);
+  background: var(--bg-card);
   overflow: hidden;
   box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
   position: relative;
@@ -60,7 +60,7 @@ function handleMouseMove(e) {
 .avatar-frame:hover {
   transform: scale(1.1) rotate(-2deg);
   box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.2);
-  border-color: #27b0ff50;
+  border-color: var(--accent);
 }
 
 .avatar-frame::after {

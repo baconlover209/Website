@@ -11,7 +11,7 @@ const galleryItems = [1, 2, 3, 4, 5, 6, 7, 8];
       <div class="feature-badge">FEATURED</div>
     </div>
 
-    <div class="thumbnails-row">
+    <div class="thumbnails-row overflow-x-scroll hide-scrollbar">
       <div v-for="i in galleryItems" :key="i" class="thumb-square">
         <div class="thumb-inner flex items-center justify-center">
           <span
@@ -34,9 +34,9 @@ const galleryItems = [1, 2, 3, 4, 5, 6, 7, 8];
 
 .feature-box {
   flex: 1;
-  border: 3px solid black;
+  border: 3px solid var(--border-color);
   position: relative;
-  background: #f8fafc;
+  background: var(--bg-card-alt);
   min-height: 0;
 }
 
@@ -51,8 +51,8 @@ const galleryItems = [1, 2, 3, 4, 5, 6, 7, 8];
   position: absolute;
   top: 1rem;
   left: 1rem;
-  background: black;
-  color: white;
+  background: var(--badge-bg);
+  color: var(--badge-text);
   padding: 0.5rem 1rem;
   font-weight: bold;
   font-family: "Outfit", sans-serif;
@@ -68,8 +68,8 @@ const galleryItems = [1, 2, 3, 4, 5, 6, 7, 8];
 .thumb-square {
   aspect-ratio: 1/1;
   height: 100%;
-  border: 3px solid black;
-  background: white;
+  border: 3px solid var(--border-color);
+  background: var(--bg-card);
   padding: 4px;
   cursor: pointer;
   transition: transform 0.2s;
@@ -77,13 +77,20 @@ const galleryItems = [1, 2, 3, 4, 5, 6, 7, 8];
 
 .thumb-square:hover {
   transform: translateY(-4px);
-  background: #06b6d4;
+  background: var(--accent);
 }
 
 .thumb-inner {
   width: 100%;
   height: 100%;
-  border: 2px solid black;
-  background: #e0f2fe;
+  border: 2px solid var(--border-color);
+  background: var(--bg-card-alt);
+}
+
+.hide-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.hide-scrollbar{
+  scrollbar-width: none;
 }
 </style>
