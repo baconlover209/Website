@@ -11,7 +11,6 @@ const posts = [
     mood: "MOOD",
     text: "uuhhh idk",
     likes: 1,
-    replies: 0,
     comments: [],
   },
   {
@@ -22,7 +21,6 @@ const posts = [
     moodBg: "#f1f5f9",
     text: "working on that new commission, will post soon...",
     likes: 12,
-    replies: 3,
     comments: [
       {
         user: "person",
@@ -97,7 +95,7 @@ const closePost = () => {
           <div class="action-btn">
             <div class="i-mdi-message-outline"></div>
             <span>{{
-              post.replies ? "Reply (" + post.replies + ")" : "Reply"
+              (post.comments && post.comments.length > 0) ? "Reply (" + post.comments.length + ")" : "Reply"
             }}</span>
           </div>
         </div>
