@@ -11,7 +11,7 @@ const galleryItems = [1, 2, 3, 4, 5, 6, 7, 8];
       <div class="feature-badge">FEATURED</div>
     </div>
 
-    <div class="thumbnails-row">
+    <div class="thumbnails-row overflow-x-scroll hide-scrollbar">
       <div v-for="i in galleryItems" :key="i" class="thumb-square">
         <div class="thumb-inner flex items-center justify-center">
           <span
@@ -85,5 +85,12 @@ const galleryItems = [1, 2, 3, 4, 5, 6, 7, 8];
   height: 100%;
   border: 2px solid black;
   background: #e0f2fe;
+}
+
+.hide-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.hide-scrollbar{
+  scrollbar-width: none;
 }
 </style>
