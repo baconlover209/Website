@@ -2,12 +2,18 @@
 import { ref } from "vue";
 import PostModal from "./modals/PostModal.vue";
 
-const navLinks = ["Bluesky", "link", "link", "link"];
+const navLinks = ["Twitter", "Bluesky", "Kofi", "discord"];
+const navLinkUrls = {
+  Twitter: "https://twitter.com/ntHungarianDart",
+  Bluesky: "https://bsky.app/profile/notHungarianDart.bsky.social",
+  Kofi: "https://ko-fi.com/notHungarianDart",
+  discord: "https://discord.com/users/589232752608673799",
+};
 
 const posts = [
   {
     id: 1,
-    date: "TODAY 4:20 PM",
+    date: "1767344428",
     mood: "MOOD",
     text: "uuhhh idk",
     likes: 1,
@@ -15,7 +21,7 @@ const posts = [
   },
   {
     id: 2,
-    date: "YESTERDAY",
+    date: "1767179628",
     mood: "WIP",
     moodColor: "#64748b",
     moodBg: "#f1f5f9",
@@ -36,6 +42,19 @@ const posts = [
 
 const selectedPost = ref(null);
 
+function getRelativeTime(timestamp) {
+  const now = Math.floor(Date.now() / 1000);
+  const diff = now - timestamp;
+  const date = new Date(timestamp * 1000);
+
+  if (diff < 60) return `${diff} seconds ago`;
+  if (diff < 3600) return `${Math.floor(diff / 60)} minutes ago`;
+  if (diff < 86400) return `${Math.floor(diff / 3600)} hours ago`;
+  if (diff < 2 * 86400) return `1 day ago`;
+  if (diff < 7 * 86400) return `${Math.floor(diff / 86400)} days ago`;
+  return date.toDateString();
+}
+
 const openPost = (post) => {
   selectedPost.value = post;
   console.log(selectedPost);
@@ -49,14 +68,17 @@ const closePost = () => {
 <template>
   <div class="bio-container">
     <nav class="links-nav">
-      <a v-for="link in navLinks" :key="link" href="#" class="nav-link">
+      <a v-for="link in navLinks" :key="link" :href="navLinkUrls[link]" class="nav-link">
         {{ link }}
       </a>
     </nav>
 
     <div class="bio-content">
       <h2 class="section-label">BIO</h2>
-      <p class="bio-text">big bio uhhh</p>
+      <p class="bio-text">
+        Hi! Welcome to my page! I will be posting the occasional update here as well as some of my art. Kinda just my space to share stuff<br>
+        -Dart
+      </p>
     </div>
 
     <div class="blog-section">
@@ -73,7 +95,7 @@ const closePost = () => {
         :style="{ marginTop: post.id > 1 ? '1rem' : '0' }"
       >
         <div class="entry-meta">
-          <span class="entry-date">{{ post.date }}</span>
+          <span class="entry-date">{{getRelativeTime( post.date) }}</span>
           <div
             class="entry-badge"
             :style="{
@@ -110,7 +132,7 @@ const closePost = () => {
 .bio-container {
   display: flex;
   flex-direction: column;
-  gap: 3rem;
+  gap: 2rem;
 }
 
 .links-nav {

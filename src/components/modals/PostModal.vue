@@ -36,7 +36,7 @@ defineEmits(["close"]);
 
                     <div class="p-8 overflow-y-auto flex-1">
                         <div class="flex gap-2 font-display text-sm text-slate-400 font-bold mb-2">
-                            <span> {{ post.date }} </span>
+                            <span> {{ getRelativeTime(post.date)}} </span>
                             <span class="text-slate-400">::</span>
                             <span class="text-cyan-500 uppercase"> {{ post.mood }}</span>
                         </div>

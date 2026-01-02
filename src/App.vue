@@ -187,7 +187,7 @@ body {
 }
 
 .sidebar-header {
-  background: #06b6d4;
+  background: #00b5ec;
   transition: .35s cubic-bezier(.1,0,.5,1.5);
   transition-property: --x, --y;
   padding: 2rem;
