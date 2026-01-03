@@ -4,12 +4,12 @@ import ImageView from "@/components/modals/ImageView.vue";
 import { fetchArt } from "@/utils/fetchArt";
 import { onMounted, ref } from "vue";
 
-var galleryItems = [];
+var galleryItems = ref([]);
 
 onMounted(async () => {
     try {
         const data = await fetchArt("homepage");
-        galleryItems = data.pieces; // Assign the "pieces" array from the JSON
+        galleryItems.value = data.pieces; // Assign the "pieces" array from the JSON
         console.log(galleryItems);
     } catch (error) {
         console.error('Error loading gallery items:', error);
@@ -44,7 +44,7 @@ const selectedImage = ref(null);
       </div>
     </div>
     <ImageView :image="selectedImage" @close="closeImage" />
-   </div>
+  </div>
 </template>
 
 <style scoped>
