@@ -28,21 +28,23 @@ const selectedImage = ref(null);
 </script>
 
 <template>
-  <div class="gallery-layout">
-    <div class="feature-box">
-      <img :src="artUrl" class="feature-img" />
-      <div class="feature-badge">FEATURED</div>
-    </div>
+  <div class="h-100%">
+    <div class="gallery-layout">
+      <div class="feature-box">
+        <img :src="artUrl" class="feature-img" />
+        <div class="feature-badge">FEATURED</div>
+      </div>
 
-    <div class="thumbnails-row overflow-x-scroll hide-scrollbar">
-      <div v-for="item in galleryItems" :key="item.id" class="thumb-square">
-        <div class="thumb-inner flex items-center justify-center">
-          <img :src="item.img" class="thumb-square" :alt="item.name" @click="openImage(item)"/>
+      <div class="thumbnails-row overflow-x-scroll hide-scrollbar">
+        <div v-for="item in galleryItems" :key="item.id" class="thumb-square">
+          <div class="thumb-inner flex items-center justify-center">
+            <img :src="item.img" class="thumb-square" :alt="item.name" @click="openImage(item)"/>
+          </div>
         </div>
       </div>
     </div>
-  </div>
-   <ImageView :image="selectedImage" @close="closeImage" />
+    <ImageView :image="selectedImage" @close="closeImage" />
+   </div>
 </template>
 
 <style scoped>
