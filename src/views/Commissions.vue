@@ -1,5 +1,7 @@
 <script setup>
-import { ref, computed } from "vue";
+import { ref, computed, onMounted } from "vue";
+import { fetchArt } from '@/utils/fetchArt';
+
 
 const selectedStyle = ref("Cell");
 
@@ -17,11 +19,16 @@ const pricing = {
   ],
 };
 
-const paintingStack = ref([
-  "/art/Erowoak.webp",
-  "/art/G8TcZLMWEAA5qz9.webp",
-  "/art/G2B8JGoWEAA1IEw.webp",
-]);
+const paintingStack = ref([]);
+
+onMounted(async () => {
+    try {
+        const data = await fetchArt("comm_flipbook");
+        paintingStack.value = data.pieces.map(item => item.img); // Assign the "pieces" array from the JSON
+    } catch (error) {
+        console.error('Error loading gallery items:', error);
+    }
+});
 
 const shufflePaintings = () => {
   const top = paintingStack.value.pop();
@@ -470,6 +477,10 @@ const backgrounds = [
   text-transform: uppercase;
   line-height: 0.8;
   margin-bottom: 2.5rem;
+}
+
+.text-pop {
+  color: var(--text-primary);
 }
 
 .painting-details {

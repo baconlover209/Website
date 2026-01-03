@@ -1,25 +1,9 @@
 <script setup>
 import ImageView from '@/components/modals/ImageView.vue';
-import { ref } from 'vue';
+import { ref, onMounted } from 'vue';
+import { fetchArt } from '@/utils/fetchArt';
 
-const galleryItems = [
-    { name: "name", date: "23094723082", img: "/art/EVIL2.webp" },
-    { name: "name", date: "23094723082", img: "/art/sfdfsdsdfsfdfsvdvds.webp" },
-    { name: "name", date: "23094723082", img: "/art/aeroero22.webp" },
-    { name: "name", date: "23094723082", img: "/art/EVIL2.webp" },
-    { name: "name", date: "23094723082", img: "/art/sfdfsdsdfsfdfsvdvds.webp" },
-    { name: "name", date: "23094723082", img: "/art/aeroero22.webp" },
-    { name: "name", date: "23094723082", img: "/art/EVIL2.webp" },
-    { name: "name", date: "23094723082", img: "/art/sfdfsdsdfsfdfsvdvds.webp" },
-    { name: "name", date: "23094723082", img: "/art/aeroero22.webp" },
-    { name: "name", date: "23094723082", img: "/art/EVIL2.webp" },
-    { name: "name", date: "23094723082", img: "/art/sfdfsdsdfsfdfsvdvds.webp" },
-    { name: "name", date: "23094723082", img: "/art/aeroero22.webp" },
-    { name: "name", date: "23094723082", img: "/art/EVIL2.webp" },
-    { name: "name", date: "23094723082", img: "/art/sfdfsdsdfsfdfsvdvds.webp" },
-    { name: "name", date: "23094723082", img: "/art/aeroero22.webp" },
-];
-
+const galleryItems = ref([]);
 const selectedImage = ref(null);
 
 function closeImage() {
@@ -29,6 +13,16 @@ function closeImage() {
 function openImage(image) {
     selectedImage.value = image;
 }
+
+onMounted(async () => {
+    try {
+        const data = await fetchArt();
+        galleryItems.value = data.pieces; // Assign the "pieces" array from the JSON
+    } catch (error) {
+        console.error('Error loading gallery items:', error);
+    }
+});
+
 </script>
 
 <template>
@@ -38,7 +32,7 @@ function openImage(image) {
                 <transition-group name="gallery-item" tag="div" class="grid-wrapper">
                     <div v-for="item in galleryItems" :key="item.img" class="grid-item">
                         <div class="item-square hover-subtle hover:cursor-pointer">
-                            <img :src="item.img" class="grid-img" :alt="item.name" @click="openImage(item)"/>
+                            <img :src="item.img" class="grid-img" :alt="item.name" @click="openImage(item)" />
                         </div>
                         <div class="item-caption">{{ item.name }} — {{ (new Date(Number(item.date))).toLocaleDateString() }}
                         </div>

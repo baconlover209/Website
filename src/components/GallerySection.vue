@@ -1,17 +1,20 @@
 <script setup>
 import artUrl from "../assets/character.webp";
 import ImageView from "@/components/modals/ImageView.vue";
-import { ref } from "vue";
-const galleryItems = [
-    { name: "name", date: "23094723082", img: "/art/EVIL2.webp" },
-    { name: "name", date: "23094723082", img: "/art/sfdfsdsdfsfdfsvdvds.webp" },
-    { name: "name", date: "23094723082", img: "/art/aeroero22.webp" },
-    { name: "name", date: "23094723082", img: "/art/EVIL2.webp" },
-    { name: "name", date: "23094723082", img: "/art/sfdfsdsdfsfdfsvdvds.webp" },
-    { name: "name", date: "23094723082", img: "/art/aeroero22.webp" },
-    { name: "name", date: "23094723082", img: "/art/EVIL2.webp" },
-    { name: "name", date: "23094723082", img: "/art/sfdfsdsdfsfdfsvdvds.webp" },
-];
+import { fetchArt } from "@/utils/fetchArt";
+import { onMounted, ref } from "vue";
+
+var galleryItems = [];
+
+onMounted(async () => {
+    try {
+        const data = await fetchArt("homepage");
+        galleryItems = data.pieces; // Assign the "pieces" array from the JSON
+        console.log(galleryItems);
+    } catch (error) {
+        console.error('Error loading gallery items:', error);
+    }
+});
 
 function closeImage() {
     selectedImage.value = null;
@@ -32,7 +35,7 @@ const selectedImage = ref(null);
     </div>
 
     <div class="thumbnails-row overflow-x-scroll hide-scrollbar">
-      <div v-for="item in galleryItems" :key="item.name" class="thumb-square">
+      <div v-for="item in galleryItems" :key="item.id" class="thumb-square">
         <div class="thumb-inner flex items-center justify-center">
           <img :src="item.img" class="thumb-square" :alt="item.name" @click="openImage(item)"/>
         </div>
