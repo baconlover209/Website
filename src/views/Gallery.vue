@@ -29,29 +29,48 @@ function closeImage() {
 function openImage(image) {
     selectedImage.value = image;
 }
-
 </script>
 
 <template>
-    <div class="gallery-view">
-        <div class="middle-grid m-10">
-            <div v-for="item in galleryItems" :key="item.name" class="grid-item">
-                <div class="item-square hover-subtle hover:cursor-pointer" >
-                    <img :src="item.img" class="grid-img" :alt="item.name" @click="openImage(item)"/>
-                </div>
-                <div class="item-caption">{{ item.name }} — {{ (new Date(Number(item.date))).toLocaleDateString() }}
-                </div>
+    <div>
+        <div class="gallery-view">
+            <div class="middle-grid m-10">
+                <transition-group name="gallery-item" tag="div" class="grid-wrapper">
+                    <div v-for="item in galleryItems" :key="item.img" class="grid-item">
+                        <div class="item-square hover-subtle hover:cursor-pointer">
+                            <img :src="item.img" class="grid-img" :alt="item.name" @click="openImage(item)"/>
+                        </div>
+                        <div class="item-caption">{{ item.name }} — {{ (new Date(Number(item.date))).toLocaleDateString() }}
+                        </div>
+                    </div>
+                </transition-group>
             </div>
         </div>
+        <transition name="modal-fade" mode="out-in">
+            <ImageView v-if="selectedImage" :image="selectedImage" @close="closeImage" />
+        </transition>
     </div>
-    <ImageView :image="selectedImage" @close="closeImage" />
 </template>
 
 <style scoped>
+.gallery-view {
+    background: var(--bg-main);
+    min-height: 100%;
+}
+
+.grid-wrapper {
+    display: contents;
+}
+
 .middle-grid {
     display: grid;
     grid-template-columns: repeat(4, minmax(0, 1fr));
     gap: 2rem;
+}
+
+.grid-item {
+    display: flex;
+    flex-direction: column;
 }
 
 .item-square {
@@ -68,6 +87,13 @@ function openImage(image) {
     width: 100%;
     height: 100%;
     object-fit: cover;
+}
+
+.item-caption {
+    font-weight: 1000;
+    text-transform: uppercase;
+    font-size: 1.2rem;
+    color: var(--text-primary);
 }
 
 .hover-subtle:hover {
