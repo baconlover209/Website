@@ -7,7 +7,7 @@ const navLinkUrls = {
   Twitter: "https://twitter.com/ntHungarianDart",
   Bluesky: "https://bsky.app/profile/notHungarianDart.bsky.social",
   Kofi: "https://ko-fi.com/notHungarianDart",
-  discord: "https://discord.com/users/589232752608673799",
+  discord: "https://discord.gg/tjDhxMrF",
 };
 
 const posts = [
@@ -35,7 +35,7 @@ const posts = [
       {
         user: "person2",
         text: "life is roblos",
-      }
+      },
     ],
   },
 ];
@@ -57,7 +57,12 @@ const closePost = () => {
 <template>
   <div class="bio-container">
     <nav class="links-nav">
-      <a v-for="link in navLinks" :key="link" :href="navLinkUrls[link]" class="nav-link">
+      <a
+        v-for="link in navLinks"
+        :key="link"
+        :href="navLinkUrls[link]"
+        class="nav-link"
+      >
         {{ link }}
       </a>
     </nav>
@@ -65,7 +70,8 @@ const closePost = () => {
     <div class="bio-content">
       <h2 class="section-label">BIO</h2>
       <p class="bio-text">
-        Hi! Welcome to my page! I will be posting the occasional update here as well as some of my art. Kinda just my space to share stuff<br>
+        Hi! Welcome to my page! I will be posting the occasional update here as
+        well as some of my art. Kinda just my space to share stuff<br />
         -Dart
       </p>
     </div>
@@ -84,7 +90,7 @@ const closePost = () => {
         :style="{ marginTop: post.id > 1 ? '1rem' : '0' }"
       >
         <div class="entry-meta">
-          <span class="entry-date">{{getRelativeTime( post.date) }}</span>
+          <span class="entry-date">{{ getRelativeTime(post.date) }}</span>
           <div
             class="entry-badge"
             :style="{
@@ -106,7 +112,9 @@ const closePost = () => {
           <div class="action-btn">
             <div class="i-mdi-message-outline"></div>
             <span>{{
-              (post.comments && post.comments.length > 0) ? "Reply (" + post.comments.length + ")" : "Reply"
+              post.comments && post.comments.length > 0
+                ? "Reply (" + post.comments.length + ")"
+                : "Reply"
             }}</span>
           </div>
         </div>

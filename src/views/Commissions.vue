@@ -73,7 +73,12 @@ const backgrounds = [
           <div class="header-block">
             <div class="header-top">
               <div class="logo-mark animated-halftone">
-                <div class="i-mdi-chevron-triple-up text-3xl text-white"></div>
+                <div class="halftone-overlay"></div>
+                <div style="position: relative; z-index: 1">
+                  <div
+                    class="i-mdi-chevron-triple-up text-3xl text-white"
+                  ></div>
+                </div>
               </div>
               <h1 class="title-main">Commissions</h1>
             </div>

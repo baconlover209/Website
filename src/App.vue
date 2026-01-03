@@ -80,7 +80,10 @@ onUnmounted(() => {
     <div class="main-container">
       <aside class="left-column">
         <div class="sidebar-header animated-halftone">
-          <ProfileSidebar />
+          <div class="halftone-overlay"></div>
+          <div style="position: relative; z-index: 1">
+            <ProfileSidebar />
+          </div>
           <button
             class="mobile-bio-toggle"
             @click="isMobileBioOpen = !isMobileBioOpen"
@@ -135,6 +138,7 @@ onUnmounted(() => {
   --badge-text: #ffffff;
   --halftone-bg: #00b5ec;
   --halftone-opacity: 0.3;
+  --halftone-dot-color: #0ff;
 }
 
 .dark {
@@ -156,8 +160,9 @@ onUnmounted(() => {
   --sidebar-border: #1e293b;
   --badge-bg: var(--accent);
   --badge-text: #ffffff;
-  --halftone-bg: #00b5ec;
-  --halftone-opacity: 0.3;
+  --halftone-bg: #00ccec;
+  --halftone-opacity: 0.8;
+  --halftone-dot-color: #0ff;
 }
 
 * {
@@ -338,11 +343,20 @@ body {
   --y: var(--my);
 }
 
-.animated-halftone::before {
-  content: "";
+.halftone-overlay {
   position: absolute;
   inset: 0;
   pointer-events: none;
+  opacity: var(--halftone-opacity);
+  mix-blend-mode: hard-light;
+  mask-image: linear-gradient(to top, transparent, black);
+  transform: translateZ(0);
+}
+
+.halftone-overlay::before {
+  content: "";
+  position: absolute;
+  inset: 0;
   --pattern: radial-gradient(closest-side, #777, #fff) 0/ 1em 1em space;
   --map: radial-gradient(
     circle farthest-corner at var(--x) var(--y),
@@ -351,9 +365,15 @@ body {
   );
   background: var(--pattern), var(--map);
   background-blend-mode: multiply;
-  mix-blend-mode: screen;
   filter: contrast(16) invert(1);
-  opacity: var(--halftone-opacity);
+}
+
+.halftone-overlay::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background-color: var(--halftone-dot-color);
+  mix-blend-mode: multiply;
 }
 
 .sidebar-body {

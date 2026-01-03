@@ -65,7 +65,7 @@ function handleMouseMove(e) {
   inset: 0;
   background: radial-gradient(
     circle 200px at var(--lx, 50%) var(--ly, 50%),
-    rgba(255, 255, 255, 0.5) 0%,
+    rgba(249, 228, 255, 0.5) 0%,
     rgba(255, 255, 255, 0.2) 50%,
     transparent 100%
   );
@@ -86,6 +86,7 @@ function handleMouseMove(e) {
 }
 
 .name-title {
+  z-index: 0;
   font-family: "Outfit", sans-serif;
   font-weight: 900;
   font-size: 3rem;
