@@ -1,6 +1,6 @@
 <script setup>
 import avatarUrl from "../assets/pfp.webp";
-import { ref } from 'vue';
+import { ref } from "vue";
 
 const card = ref(null);
 
@@ -9,19 +9,15 @@ function handleMouseMove(e) {
   const rect = card.value.getBoundingClientRect();
   const x = e.clientX - rect.left;
   const y = e.clientY - rect.top;
-  card.value.style.setProperty('--lx', `${x}px`);
-  card.value.style.setProperty('--ly', `${y}px`);
+  card.value.style.setProperty("--lx", `${x}px`);
+  card.value.style.setProperty("--ly", `${y}px`);
 }
 </script>
 
 <template>
   <div class="profile-container">
     <div class="identity-wrapper">
-      <div 
-        ref="card" 
-        class="avatar-frame" 
-        @mousemove="handleMouseMove"
-      >
+      <div ref="card" class="avatar-frame" @mousemove="handleMouseMove">
         <img :src="avatarUrl" class="avatar-img" />
       </div>
       <h1 class="name-title">DART</h1>
@@ -68,8 +64,8 @@ function handleMouseMove(e) {
   position: absolute;
   inset: 0;
   background: radial-gradient(
-    circle 200px at var(--lx, 50%) var(--ly, 50%), 
-    rgba(255, 255, 255, 0.5) 0%, 
+    circle 200px at var(--lx, 50%) var(--ly, 50%),
+    rgba(255, 255, 255, 0.5) 0%,
     rgba(255, 255, 255, 0.2) 50%,
     transparent 100%
   );
@@ -103,7 +99,21 @@ function handleMouseMove(e) {
 
 .name-title:hover {
   transform: scale(1.05) skewX(-5deg);
-  text-shadow: 4px 4px 0px rgba(0,0,0,0.2);
+  text-shadow: 4px 4px 0px rgba(0, 0, 0, 0.2);
   letter-spacing: 0em;
+}
+
+@media (max-width: 850px) {
+  .identity-wrapper {
+    gap: 1rem;
+  }
+  .avatar-frame {
+    width: 60px;
+    height: 60px;
+    border-width: 3px;
+  }
+  .name-title {
+    display: none;
+  }
 }
 </style>

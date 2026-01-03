@@ -1,6 +1,7 @@
 <script setup>
-import { onMounted, onUnmounted } from 'vue';
-import { preloadImages } from './utils/preloader';
+import { onMounted, onUnmounted, ref, watch } from "vue";
+import { useRoute } from "vue-router";
+import { preloadImages } from "./utils/preloader";
 import avatarUrl from "./assets/pfp.webp";
 import charUrl from "./assets/character.webp";
 import ProfileSidebar from "./components/ProfileSidebar.vue";
@@ -11,7 +12,7 @@ const navLinks = [
   { name: "Home", path: "/" },
   { name: "Projects", path: "/projects" },
   { name: "Gallery", path: "/gallery" },
-  { name: "Comms", path: "/commissions" }
+  { name: "Comms", path: "/commissions" },
 ];
 
 const allArt = [
@@ -26,24 +27,34 @@ const allArt = [
   "/art/G2B8JGoWEAA1IEw.webp",
   "/art/G8TcZLMWEAA5qz9.webp",
   avatarUrl,
-  charUrl
+  charUrl,
 ];
 
 function updateMouse(e) {
-  document.documentElement.style.setProperty('--mx', `${e.clientX}px`);
-  document.documentElement.style.setProperty('--my', `${e.clientY}px`);
+  document.documentElement.style.setProperty("--mx", `${e.clientX}px`);
+  document.documentElement.style.setProperty("--my", `${e.clientY}px`);
 }
 
 onMounted(() => {
-  window.addEventListener('mousemove', updateMouse);
+  window.addEventListener("mousemove", updateMouse);
   // preload all art assets immediately
   preloadImages(allArt).then(() => {
-    console.log('Art assets cached and ready');
+    console.log("Art assets cached and ready");
   });
 });
 
+const route = useRoute();
+const isMobileBioOpen = ref(false);
+
+watch(
+  () => route.path,
+  () => {
+    isMobileBioOpen.value = false;
+  }
+);
+
 onUnmounted(() => {
-  window.removeEventListener('mousemove', updateMouse);
+  window.removeEventListener("mousemove", updateMouse);
 });
 </script>
 
@@ -51,10 +62,10 @@ onUnmounted(() => {
   <div class="app-layout">
     <header class="top-navbar">
       <nav class="nav-links">
-        <RouterLink 
-          v-for="link in navLinks" 
-          :key="link.name" 
-          :to="link.path" 
+        <RouterLink
+          v-for="link in navLinks"
+          :key="link.name"
+          :to="link.path"
           class="nav-item"
           active-class="nav-active"
         >
@@ -70,8 +81,23 @@ onUnmounted(() => {
       <aside class="left-column">
         <div class="sidebar-header animated-halftone">
           <ProfileSidebar />
+          <button
+            class="mobile-bio-toggle"
+            @click="isMobileBioOpen = !isMobileBioOpen"
+            aria-label="Toggle Bio"
+          >
+            <div
+              class="icon-toggle"
+              :class="
+                isMobileBioOpen ? 'i-mdi-chevron-up' : 'i-mdi-chevron-down'
+              "
+            ></div>
+          </button>
         </div>
-        <div class="sidebar-body">
+        <div
+          class="sidebar-body"
+          :class="{ 'mobile-hidden': !isMobileBioOpen }"
+        >
           <BioSection />
         </div>
       </aside>
@@ -151,53 +177,65 @@ body {
 }
 
 @property --x {
-  syntax: '<length-percentage>';
+  syntax: "<length-percentage>";
   initial-value: 50vw;
   inherits: true;
 }
 
 @property --y {
-  syntax: '<length-percentage>';
+  syntax: "<length-percentage>";
   initial-value: 50vh;
   inherits: true;
 }
 
 @property --mx {
-  syntax: '<length-percentage>';
+  syntax: "<length-percentage>";
   initial-value: 50vw;
   inherits: true;
 }
 
 @property --my {
-  syntax: '<length-percentage>';
+  syntax: "<length-percentage>";
   initial-value: 50vh;
   inherits: true;
 }
 
 @property --ix {
-  syntax: '<length-percentage>';
+  syntax: "<length-percentage>";
   initial-value: 50%;
   inherits: true;
 }
 
 @property --iy {
-  syntax: '<length-percentage>';
+  syntax: "<length-percentage>";
   initial-value: 50%;
   inherits: true;
 }
 
 @keyframes drift {
-  0% { --ix: 20%; --iy: 20%; }
-  30% { --ix: 80%; --iy: 20%; }
-  60% { --ix: 50%; --iy: 80%; }
-  100% { --ix: 20%; --iy: 20%; }
+  0% {
+    --ix: 20%;
+    --iy: 20%;
+  }
+  30% {
+    --ix: 80%;
+    --iy: 20%;
+  }
+  60% {
+    --ix: 50%;
+    --iy: 80%;
+  }
+  100% {
+    --ix: 20%;
+    --iy: 20%;
+  }
 }
 
 .app-layout {
   display: flex;
   flex-direction: column;
   height: 100vh;
-  width: 100vw;
+  width: 100%;
   border: 4px solid var(--border-color);
   background: var(--bg-navbar);
 }
@@ -263,6 +301,10 @@ body {
   background: var(--bg-primary);
 }
 
+.mobile-bio-toggle {
+  display: none;
+}
+
 .left-column {
   flex: 0 0 600px;
   display: flex;
@@ -287,7 +329,7 @@ body {
   animation: drift 10s infinite ease-in-out;
   --x: var(--ix);
   --y: var(--iy);
-  transition: .35s cubic-bezier(.1,0,.5,1.5);
+  transition: 0.35s cubic-bezier(0.1, 0, 0.5, 1.5);
   transition-property: --x, --y;
 }
 
@@ -302,7 +344,11 @@ body {
   inset: 0;
   pointer-events: none;
   --pattern: radial-gradient(closest-side, #777, #fff) 0/ 1em 1em space;
-  --map: radial-gradient(circle farthest-corner at var(--x) var(--y), #888, #fff);
+  --map: radial-gradient(
+    circle farthest-corner at var(--x) var(--y),
+    #888,
+    #fff
+  );
   background: var(--pattern), var(--map);
   background-blend-mode: multiply;
   mix-blend-mode: screen;
@@ -361,5 +407,88 @@ body {
   width: 100%;
   height: 100%;
   overflow-y: auto;
+}
+
+@media (max-width: 1700px) {
+  .left-column {
+    flex: 0 0 420px;
+  }
+}
+
+@media (max-width: 1200px) {
+  .left-column {
+    flex: 0 0 340px;
+  }
+}
+
+@media (max-width: 850px) {
+  .main-container {
+    flex-direction: column;
+    overflow-y: auto;
+  }
+
+  .left-column {
+    flex: 0 0 auto;
+    width: 100%;
+    height: auto;
+    border-right: none;
+    border-bottom: 4px solid var(--sidebar-border);
+    overflow: visible;
+  }
+
+  .sidebar-header {
+    padding: 0.75rem;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+
+  .sidebar-body {
+    padding: 1.5rem;
+    transition: all 0.3s ease;
+    overflow: hidden;
+  }
+
+  .sidebar-body.mobile-hidden {
+    display: none;
+  }
+
+  .mobile-bio-toggle {
+    position: absolute;
+    bottom: 1rem;
+    right: 1rem;
+    background: rgba(0, 0, 0, 0.4);
+    backdrop-filter: blur(4px);
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    border: 2px solid rgba(255, 255, 255, 0.2);
+    cursor: pointer;
+    transition: all 0.2s;
+    z-index: 50;
+  }
+
+  .mobile-bio-toggle:hover {
+    background: rgba(0, 0, 0, 0.7);
+    transform: scale(1.1);
+  }
+
+  .icon-toggle {
+    font-size: 1.5rem;
+  }
+
+  .right-column {
+    overflow: visible;
+    min-height: 500px;
+  }
+
+  .nav-item {
+    font-size: 0.9rem;
+    padding: 0 0.5rem;
+  }
 }
 </style>

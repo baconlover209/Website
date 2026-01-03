@@ -1,26 +1,26 @@
 <script setup>
 import { ref, computed } from "vue";
 
-const selectedStyle = ref('Cell');
+const selectedStyle = ref("Cell");
 
 const pricing = {
   styles: [
     { name: "Sketch", color: "#94a3b8", art: "/art/bedrot.webp" },
     { name: "Flat", color: "#60a5fa", art: "/art/fdsdffdfd.webp" },
     { name: "Cell", color: "#00CCFF", art: "/art/limebih.webp" },
-    { name: "Full", color: "#f59e0b", art: "/art/wdwdwddwfgghhh.webp" }
+    { name: "Full", color: "#f59e0b", art: "/art/wdwdwddwfgghhh.webp" },
   ],
   crops: [
     { name: "Head", basePrice: 5 },
     { name: "Half", basePrice: 10 },
-    { name: "Full", basePrice: 15 }
-  ]
+    { name: "Full", basePrice: 15 },
+  ],
 };
 
 const paintingStack = ref([
   "/art/Erowoak.webp",
   "/art/G8TcZLMWEAA5qz9.webp",
-  "/art/G2B8JGoWEAA1IEw.webp"
+  "/art/G2B8JGoWEAA1IEw.webp",
 ]);
 
 const shufflePaintings = () => {
@@ -34,14 +34,14 @@ const getStylePrice = (base) => {
   return `$${price}`;
 };
 
-const currentStyleData = computed(() => 
-  pricing.styles.find(s => s.name === selectedStyle.value)
+const currentStyleData = computed(() =>
+  pricing.styles.find((s) => s.name === selectedStyle.value)
 );
 
 const backgrounds = [
   { name: "Simple", price: "Free", img: "/art/EVIL2.webp" },
   { name: "Abstract", price: "$5", img: "/art/sfdfsdsdfsfdfsvdvds.webp" },
-  { name: "Scene", price: "$10", img: "/art/aeroero22.webp" }
+  { name: "Scene", price: "$10", img: "/art/2323e.webp" },
 ];
 </script>
 
@@ -51,12 +51,19 @@ const backgrounds = [
       <div class="hero-layout">
         <div class="art-container">
           <transition name="fade-up" mode="out-in">
-            <div 
+            <div
               :key="selectedStyle"
               class="art-box"
-              :style="{ borderColor: currentStyleData.color, '--tint': currentStyleData.color }"
+              :style="{
+                borderColor: currentStyleData.color,
+                '--tint': currentStyleData.color,
+              }"
             >
-              <img :src="currentStyleData.art" class="art-image" :alt="selectedStyle" />
+              <img
+                :src="currentStyleData.art"
+                class="art-image"
+                :alt="selectedStyle"
+              />
               <span class="label-bottom">{{ selectedStyle }} Style</span>
             </div>
           </transition>
@@ -75,11 +82,11 @@ const backgrounds = [
 
           <div class="pricing-matrix">
             <div class="styles-selector">
-              <button 
-                v-for="style in pricing.styles" 
-                :key="style.name" 
+              <button
+                v-for="style in pricing.styles"
+                :key="style.name"
                 class="style-btn"
-                :class="{ 'active': selectedStyle === style.name }"
+                :class="{ active: selectedStyle === style.name }"
                 @click="selectedStyle = style.name"
               >
                 {{ style.name }}
@@ -88,19 +95,25 @@ const backgrounds = [
             </div>
 
             <div class="sub-box crops-box">
-              <div v-for="crop in pricing.crops" :key="crop.name" class="crop-row">
+              <div
+                v-for="crop in pricing.crops"
+                :key="crop.name"
+                class="crop-row"
+              >
                 <span class="crop-name">{{ crop.name }}</span>
                 <span class="crop-separator">—</span>
                 <transition name="price-fade" mode="out-in">
-                  <span :key="selectedStyle" class="crop-value text-cyan-shine">{{ getStylePrice(crop.basePrice) }}</span>
+                  <span
+                    :key="selectedStyle"
+                    class="crop-value text-cyan-shine"
+                    >{{ getStylePrice(crop.basePrice) }}</span
+                  >
                 </transition>
               </div>
             </div>
           </div>
 
-          <div class="badge-corner">
-            Per character
-          </div>
+          <div class="badge-corner">Per character</div>
         </div>
       </div>
     </div>
@@ -113,7 +126,7 @@ const backgrounds = [
         <div class="item-caption">{{ bg.name }} — {{ bg.price }}</div>
       </div>
 
-      <div class="animation-card card-outer hover-subtle">
+      <div class="animation-card hover-subtle">
         <h3 class="anim-title">Animation</h3>
         <div class="anim-lines">
           <div class="line">✦ uhh blahh</div>
@@ -142,15 +155,17 @@ const backgrounds = [
 
       <div class="photo-deck" @click="shufflePaintings">
         <transition-group name="deck-flip">
-          <div 
-            v-for="(img, idx) in paintingStack" 
+          <div
+            v-for="(img, idx) in paintingStack"
             :key="img"
             class="photo-wrap"
             :class="{ 'is-top': idx === paintingStack.length - 1 }"
-            :style="{ 
-              zIndex: idx, 
-              transform: `rotate(${idx * 4 - 4}deg) translateX(${idx * 15 - 15}px)`,
-              pointerEvents: (idx === paintingStack.length - 1) ? 'auto' : 'none'
+            :style="{
+              zIndex: idx,
+              transform: `rotate(${idx * 4 - 4}deg) translateX(${
+                idx * 15 - 15
+              }px)`,
+              pointerEvents: idx === paintingStack.length - 1 ? 'auto' : 'none',
             }"
           >
             <img :src="img" class="spread-img" />
@@ -201,7 +216,11 @@ const backgrounds = [
   justify-content: center;
   position: relative;
   overflow: hidden;
-  background: color-mix(in srgb, var(--tint, var(--bg-card-alt)) 15%, var(--bg-card-alt));
+  background: color-mix(
+    in srgb,
+    var(--tint, var(--bg-card-alt)) 15%,
+    var(--bg-card-alt)
+  );
 }
 
 .art-image {
@@ -332,9 +351,16 @@ const backgrounds = [
   text-transform: uppercase;
 }
 
-.crop-name { text-align: left; }
-.crop-separator { text-align: center; color: var(--text-primary); }
-.crop-value { text-align: left; }
+.crop-name {
+  text-align: left;
+}
+.crop-separator {
+  text-align: center;
+  color: var(--text-primary);
+}
+.crop-value {
+  text-align: left;
+}
 
 .text-cyan-shine {
   color: var(--accent);
@@ -355,7 +381,7 @@ const backgrounds = [
 
 .middle-grid {
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
+  grid-template-columns: repeat(4, minmax(0, 1fr));
   gap: 2rem;
 }
 
@@ -388,15 +414,26 @@ const backgrounds = [
 }
 
 .animation-card {
-  padding: 2rem;
+  padding: 1.5rem;
   background: var(--bg-card);
+  aspect-ratio: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  overflow: hidden;
+  container-type: inline-size;
+  border: 4px solid var(--border-color);
+  box-shadow: 8px 8px 0px 0px var(--border-color);
+  transition: all 0.3s ease;
 }
 
 .anim-title {
-  font-size: 2.22rem;
+  font-size: clamp(1.2rem, 11cqw, 2.2rem);
   font-weight: 1000;
   text-transform: uppercase;
   margin-bottom: 1.25rem;
+  line-height: 1;
+  overflow-wrap: break-word;
 }
 
 .anim-lines {
@@ -406,6 +443,7 @@ const backgrounds = [
   display: flex;
   flex-direction: column;
   gap: 0.6rem;
+  overflow-wrap: break-word;
 }
 
 .section-divider {
@@ -456,8 +494,12 @@ const backgrounds = [
   margin-bottom: 1.25rem;
 }
 
-.short { width: 120px; }
-.long { width: 400px; }
+.short {
+  width: 120px;
+}
+.long {
+  width: 400px;
+}
 
 .photo-deck {
   position: relative;
@@ -475,7 +517,7 @@ const backgrounds = [
   width: 320px;
   height: 400px;
   border: 12px solid white;
-  box-shadow: 0 10px 40px -5px rgba(0,0,0,0.4);
+  box-shadow: 0 10px 40px -5px rgba(0, 0, 0, 0.4);
   transition: all 0.3s cubic-bezier(0.23, 1, 0.32, 1);
   overflow: hidden;
   background: #eee;
@@ -516,32 +558,148 @@ const backgrounds = [
 }
 
 @keyframes flip-out {
-  0% { transform: translate(0, 0) rotate(0deg); opacity: 1; }
-  60% { transform: translate(280px, -40px) rotate(15deg); opacity: 1; }
-  100% { transform: translate(0, 20px) rotate(0deg); opacity: 0.2; }
+  0% {
+    transform: translate(0, 0) rotate(0deg);
+    opacity: 1;
+  }
+  60% {
+    transform: translate(280px, -40px) rotate(15deg);
+    opacity: 1;
+  }
+  100% {
+    transform: translate(0, 20px) rotate(0deg);
+    opacity: 0.2;
+  }
 }
 
 @keyframes flip-in {
-  0% { opacity: 0; transform: scale(0.95); }
-  100% { opacity: 1; transform: scale(1); }
+  0% {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
 }
 
-.fade-up-enter-active, .fade-up-leave-active {
+.fade-up-enter-active,
+.fade-up-leave-active {
   transition: all 0.4s ease;
 }
-.fade-up-enter-from { opacity: 0; transform: translateY(20px); }
-.fade-up-leave-to { opacity: 0; transform: translateY(-20px); }
+.fade-up-enter-from {
+  opacity: 0;
+  transform: translateY(20px);
+}
+.fade-up-leave-to {
+  opacity: 0;
+  transform: translateY(-20px);
+}
 
-.price-fade-enter-active, .price-fade-leave-active {
+.price-fade-enter-active,
+.price-fade-leave-active {
   transition: all 0.3s ease;
 }
-.price-fade-enter-from, .price-fade-leave-to { opacity: 0; transform: scale(0.98); }
+.price-fade-enter-from,
+.price-fade-leave-to {
+  opacity: 0;
+  transform: scale(0.98);
+}
 
-@media (max-width: 1400px) {
-  .left-column { flex: 0 0 420px; }
-  .hero-layout { grid-template-columns: 1fr; }
-  .art-box { height: 480px; }
-  .photo-deck { width: 100%; height: 440px; }
-  .photo-wrap { width: 260px; height: 340px; }
+@media (max-width: 1600px) {
+  .hero-layout {
+    grid-template-columns: 1fr;
+  }
+  .pricing-matrix {
+    grid-template-columns: 1fr;
+  }
+  .art-box {
+    height: 480px;
+  }
+  .painting-layout {
+    grid-template-columns: 1fr;
+    gap: 4rem;
+  }
+  .photo-deck {
+    margin: 0 auto;
+  }
+}
+
+@media (max-width: 1250px) {
+  .middle-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 1.5rem;
+  }
+  .title-huge {
+    font-size: 5rem;
+  }
+  .title-main {
+    font-size: 3.5rem;
+  }
+}
+
+@media (max-width: 850px) {
+  .commissions-view {
+    padding: 1.5rem;
+    gap: 2rem;
+  }
+  .middle-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 1rem;
+  }
+
+  .painting-layout {
+    grid-template-columns: 1fr;
+    gap: 3rem;
+  }
+
+  .title-huge {
+    font-size: 4rem;
+  }
+
+  .photo-deck {
+    width: 100%;
+    height: 400px;
+    transform: scale(0.9);
+  }
+
+  .title-main {
+    font-size: 3rem;
+  }
+
+  .styles-selector {
+    flex-direction: row;
+    flex-wrap: wrap;
+  }
+
+  .style-btn {
+    flex: 1;
+    min-width: 100px;
+    text-align: center;
+  }
+}
+
+@media (max-width: 500px) {
+  .middle-grid {
+    grid-template-columns: 1fr;
+  }
+  .crop-row {
+    font-size: 1.5rem;
+    grid-template-columns: 80px 30px 1fr;
+  }
+  .hero-layout {
+    padding: 1.5rem;
+  }
+  .art-box {
+    height: 320px;
+  }
+  .photo-deck {
+    height: 350px;
+    transform: scale(0.8);
+  }
+  .photo-wrap {
+    width: 240px;
+    height: 300px;
+  }
 }
 </style>
