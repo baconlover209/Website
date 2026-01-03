@@ -1,7 +1,27 @@
 <script setup>
 import artUrl from "../assets/character.webp";
+import ImageView from "@/components/modals/ImageView.vue";
+import { ref } from "vue";
+const galleryItems = [
+    { name: "name", date: "23094723082", img: "/art/EVIL2.webp" },
+    { name: "name", date: "23094723082", img: "/art/sfdfsdsdfsfdfsvdvds.webp" },
+    { name: "name", date: "23094723082", img: "/art/aeroero22.webp" },
+    { name: "name", date: "23094723082", img: "/art/EVIL2.webp" },
+    { name: "name", date: "23094723082", img: "/art/sfdfsdsdfsfdfsvdvds.webp" },
+    { name: "name", date: "23094723082", img: "/art/aeroero22.webp" },
+    { name: "name", date: "23094723082", img: "/art/EVIL2.webp" },
+    { name: "name", date: "23094723082", img: "/art/sfdfsdsdfsfdfsvdvds.webp" },
+];
 
-const galleryItems = [1, 2, 3, 4, 5, 6, 7, 8];
+function closeImage() {
+    selectedImage.value = null;
+}
+
+function openImage(image) {
+    selectedImage.value = image;
+}
+
+const selectedImage = ref(null);
 </script>
 
 <template>
@@ -12,15 +32,14 @@ const galleryItems = [1, 2, 3, 4, 5, 6, 7, 8];
     </div>
 
     <div class="thumbnails-row overflow-x-scroll hide-scrollbar">
-      <div v-for="i in galleryItems" :key="i" class="thumb-square">
+      <div v-for="item in galleryItems" :key="item.name" class="thumb-square">
         <div class="thumb-inner flex items-center justify-center">
-          <span
-            class="i-fa6-regular-image text-5xl text-gray-400 w-12 h-12 block"
-          ></span>
+          <img :src="item.img" class="thumb-square" :alt="item.name" @click="openImage(item)"/>
         </div>
       </div>
     </div>
   </div>
+   <ImageView :image="selectedImage" @close="closeImage" />
 </template>
 
 <style scoped>
@@ -57,12 +76,41 @@ const galleryItems = [1, 2, 3, 4, 5, 6, 7, 8];
   font-weight: bold;
   font-family: "Outfit", sans-serif;
   border-radius: 4px;
+  overflow: hidden;
+  /* For shine effect */
+  position: absolute;
+  transform: translate(0,0px);
+  transition: transform 0.5s cubic-bezier(0.075, 0.82, 0.165, 1);
+}
+
+.feature-badge:hover {
+  transform: translate(0,-5px);
+  transition: transform 0.5s cubic-bezier(0.075, 0.82, 0.165, 1);
+}
+
+.feature-badge::before {
+  content: "";
+  position: absolute;
+  top: -50%;
+  left: -75%;
+  width: 60%;
+  height: 200%;
+  background: linear-gradient(120deg, rgba(255,255,255,0.0) 0%, rgba(255,255,255,0.5) 50%, rgba(255,255,255,0.0) 100%);
+  transform: skewX(-25deg);
+  transition: transform 0.6s cubic-bezier(.4,1.6,.6,1);
+  pointer-events: none;
+}
+
+.feature-badge:hover::before {
+  transform: translateX(300%) skewX(-25deg);
+  transition: transform 0.6s cubic-bezier(.4,1.6,.6,1);
 }
 
 .thumbnails-row {
   display: flex;
   gap: 1.5rem;
-  height: 150px;
+  height: 12rem;
+  padding-top: 4px;
 }
 
 .thumb-square {

@@ -1,6 +1,5 @@
 <script setup>
 import { defineAsyncComponent } from "vue";
-
 import GallerySection from "../components/GallerySection.vue";
 </script>
 

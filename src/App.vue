@@ -156,7 +156,7 @@ onUnmounted(() => {
   --nav-text: #ffffff;
   --nav-hover-bg: #1e293b;
   --nav-active-bg: #334155;
-  --accent: #38bdf8;
+  --accent: #32cce0;
   --sidebar-border: #1e293b;
   --badge-bg: var(--accent);
   --badge-text: #ffffff;
