@@ -11,9 +11,9 @@ const pricing = {
     { name: "Full", color: "#f59e0b", art: "/art/wdwdwddwfgghhh.webp" }
   ],
   crops: [
-    { name: "Head", basePrice: 20 },
-    { name: "Half", basePrice: 45 },
-    { name: "Full", basePrice: 80 }
+    { name: "Head", basePrice: 5 },
+    { name: "Half", basePrice: 10 },
+    { name: "Full", basePrice: 15 }
   ]
 };
 
@@ -29,7 +29,7 @@ const shufflePaintings = () => {
 };
 
 const getStylePrice = (base) => {
-  const multipliers = { Sketch: 0.5, Flat: 0.8, Cell: 1, Full: 1.5 };
+  const multipliers = { Sketch: 0.5, Flat: 1, Cell: 1.5, Full: 2 };
   const price = Math.round(base * multipliers[selectedStyle.value]);
   return `$${price}`;
 };
@@ -39,9 +39,9 @@ const currentStyleData = computed(() =>
 );
 
 const backgrounds = [
-  { name: "Simple", price: "$30", img: "/art/EVIL2.webp" },
-  { name: "Abstract", price: "$50", img: "/art/sfdfsdsdfsfdfsvdvds.webp" },
-  { name: "Scene", price: "$100", img: "/art/aeroero22.webp" }
+  { name: "Simple", price: "Free", img: "/art/EVIL2.webp" },
+  { name: "Abstract", price: "$5", img: "/art/sfdfsdsdfsfdfsvdvds.webp" },
+  { name: "Scene", price: "$10", img: "/art/aeroero22.webp" }
 ];
 </script>
 
@@ -66,7 +66,7 @@ const backgrounds = [
           <div class="header-block">
             <div class="header-top">
               <div class="logo-mark animated-halftone">
-                <div class="i-mdi-lightning-bolt text-3xl text-white"></div>
+                <div class="i-mdi-chevron-triple-up text-3xl text-white"></div>
               </div>
               <h1 class="title-main">Commissions</h1>
             </div>
@@ -104,7 +104,7 @@ const backgrounds = [
         </div>
       </div>
     </div>
-
+    <h class="anim-title">Backgrounds</h>
     <div class="middle-grid">
       <div v-for="bg in backgrounds" :key="bg.name" class="grid-item">
         <div class="item-square hover-subtle">
@@ -325,12 +325,11 @@ const backgrounds = [
 
 .crop-row {
   display: grid;
-  grid-template-columns: 130px 50px 1fr;
+  grid-template-columns: 100px 50px 1fr;
   align-items: center;
-  font-size: 2.8rem;
+  font-size: 2rem;
   font-weight: 1000;
   text-transform: uppercase;
-  line-height: 1;
 }
 
 .crop-name { text-align: left; }
