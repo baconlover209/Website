@@ -1,6 +1,7 @@
 <script setup>
 import avatarUrl from "../assets/pfp.webp";
 import { ref, onMounted, onUnmounted } from "vue";
+import normal from "./normal.vue";
 
 const props = defineProps({
   isSlideshowActive: Boolean,
@@ -53,7 +54,7 @@ const formatDate = (date) => {
       <transition name="fade" mode="out-in">
         <div v-if="!isSlideshowActive" key="profile" class="profile-content">
           <div ref="card" class="avatar-frame" @mousemove="handleMouseMove">
-            <img :src="avatarUrl" class="avatar-img" />
+            <normal normal-img="normal.png" diffuse-img="Wl2FTZtAa0QE2gigbTXPRnZEI_lgrJ5HdzfmTh6axoGI4f2D4k-ezgif.com-video-to-gif-converter - Copy.gif"/>
           </div>
           <h1 class="name-title">DART</h1>
         </div>
@@ -162,19 +163,7 @@ const formatDate = (date) => {
   border-color: var(--accent);
 }
 
-.avatar-frame::after {
-  content: "";
-  position: absolute;
-  inset: 0;
-  background: radial-gradient(circle 200px at var(--lx, 50%) var(--ly, 50%),
-      rgba(249, 228, 255, 0.5) 0%,
-      rgba(255, 255, 255, 0.2) 50%,
-      transparent 100%);
-  mix-blend-mode: hard-light;
-  pointer-events: none;
-  opacity: 0;
-  transition: opacity 0.3s ease;
-}
+
 
 .avatar-frame:hover::after {
   opacity: 1;

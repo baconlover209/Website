@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Normal Map Brightness Overlay</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<div id="scene">
+  <img id="diffuse" src="public\Wl2FTZtAa0QE2gigbTXPRnZEI_lgrJ5HdzfmTh6axoGI4f2D4k-ezgif.com-video-to-gif-converter - Copy.gif">
+  <canvas id="light"></canvas>
+
+  <!-- hidden normal map source -->
+  <img id="normal" src="normal.png" hidden>
+</div>
+
+<script>const canvas = document.getElementById("light");
+const ctx = canvas.getContext("2d");
+
+const diffuse = document.getElementById("diffuse");
+const normal  = document.getElementById("normal");
+
+let nData, nW, nH;
+
+function resize() {
+  const r = diffuse.getBoundingClientRect();
+  const dpr = devicePixelRatio || 1;
+
+  canvas.width  = r.width * dpr;
+  canvas.height = r.height * dpr;
+  canvas.style.width  = r.width + "px";
+  canvas.style.height = r.height + "px";
+
+  ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+}
+
+function loadNormal() {
+  nW = normal.naturalWidth;
+  nH = normal.naturalHeight;
+
+  const t = document.createElement("canvas");
+  t.width = nW;
+  t.height = nH;
+  const tctx = t.getContext("2d");
+
+  tctx.drawImage(normal, 0, 0);
+  nData = tctx.getImageData(0, 0, nW, nH);
+}
+
+function render(mx, my) {
+  const img = ctx.createImageData(canvas.width, canvas.height);
+
+  const sx = nW / canvas.width;
+  const sy = nH / canvas.height;
+
+  for (let y = 0; y < canvas.height; y++) {
+    for (let x = 0; x < canvas.width; x++) {
+      const ix = Math.floor(x * sx);
+      const iy = Math.floor(y * sy);
+      const i  = (iy * nW + ix) * 4;
+      const o  = (y * canvas.width + x) * 4;
+
+      // normal vector
+      const nx = nData.data[i]     / 255 * 2 - 1;
+      const ny = nData.data[i + 1] / 255 * 2 - 1;
+      const nz = nData.data[i + 2] / 255;
+
+      // light vector
+      const lx = mx - x;
+      const ly = my - y;
+      const lz = 200;
+
+      const len = Math.hypot(lx, ly, lz);
+      const dot = Math.max(0, (nx * lx + ny * ly + nz * lz) / len);
+
+      const v = (dot *dot * dot) * 255;
+
+      img.data[o]     = v;
+      img.data[o + 1] = v;
+      img.data[o + 2] = v;
+      img.data[o + 3] = 255;
+    }
+  }
+
+  ctx.putImageData(img, 0, 0);
+}
+
+diffuse.onload = normal.onload = () => {
+  if (diffuse.complete && normal.complete) {
+    resize();
+    loadNormal();
+    render(canvas.width / 2, canvas.height / 2);
+  }
+};
+
+window.addEventListener("resize", resize);
+
+document.getElementById("scene").addEventListener("mousemove", e => {
+  const r = canvas.getBoundingClientRect();
+  render(e.clientX - r.left, e.clientY - r.top);
+});
+</script>
+<style>
+  #scene {
+  position: relative;
+  width: 600px;
+  height: auto;
+}
+
+#scene img {
+  width: 100%;
+  display: block;
+}
+
+#light {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+
+  /* THIS is the key */
+  mix-blend-mode: screen;
+  opacity: 70%;
+}
+
+</style>
+</body>
+</html>
