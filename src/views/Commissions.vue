@@ -247,7 +247,7 @@ const backgrounds = [
   left: 0;
   right: 0;
   background: var(--border-color);
-  color: var(--text-primary);
+  color:white;
   padding: 0.6rem;
   text-align: center;
   font-weight: 1000;

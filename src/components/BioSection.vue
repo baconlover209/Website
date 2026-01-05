@@ -145,9 +145,9 @@ const closePost = () => {
   text-decoration: none;
   font-weight: 700;
   text-transform: uppercase;
-  font-size: 0.8rem;
+  font-size: 0.9rem;
   background: var(--bg-card-alt);
-  padding: 0.5rem 1rem;
+  padding: 0.5rem 2rem;
   border-radius: 8px;
   transition: all 0.2s;
   border: 1px solid transparent;

@@ -16,6 +16,8 @@ onMounted(async () => {
     }
 });
 
+const featureFullArtRef = "/art/sfdfsdsdfsfdfsvdvds.webp"
+
 function closeImage() {
     selectedImage.value = null;
 }
@@ -31,7 +33,7 @@ const selectedImage = ref(null);
   <div class="h-100%">
     <div class="gallery-layout">
       <div class="feature-box">
-        <img :src="artUrl" class="feature-img" />
+        <img :src="artUrl" class="feature-img" @click="openImage({img:featureFullArtRef})"/>
         <div class="feature-badge">FEATURED</div>
       </div>
 
