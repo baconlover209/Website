@@ -1,7 +1,10 @@
 <script setup>
 import { ref, computed, onMounted } from "vue";
-import { fetchArt } from '@/utils/fetchArt';
+import { fetchArt } from "@/utils/fetchArt";
+import HalftoneLayer from "@/components/HalftoneLayer.vue";
 
+const lx = ref("50%");
+const ly = ref("50%");
 
 const selectedStyle = ref("Cell");
 
@@ -22,15 +25,16 @@ const pricing = {
 const paintingStack = ref([]);
 
 onMounted(async () => {
-    try {
-        const data = await fetchArt("comm_flipbook");
-        paintingStack.value = data.pieces.map(item => item.img); // Assign the "pieces" array from the JSON
-    } catch (error) {
-        console.error('Error loading gallery items:', error);
-    }
+  try {
+    const data = await fetchArt("comm_flipbook");
+    paintingStack.value = data.pieces.map((item) => item.img);
+  } catch (error) {
+    console.error("Error loading gallery items:", error);
+  }
 });
 
 const shufflePaintings = () => {
+  if (paintingStack.value.length <= 1) return;
   const top = paintingStack.value.pop();
   paintingStack.value.unshift(top);
 };
@@ -50,6 +54,16 @@ const backgrounds = [
   { name: "Abstract", price: "$5", img: "/art/sfdfsdsdfsfdfsvdvds.webp" },
   { name: "Scene", price: "$10", img: "/art/2323e.webp" },
 ];
+
+const logoMark = ref(null);
+function handleLogoMouse(e) {
+  if (!logoMark.value) return;
+  const rect = logoMark.value.getBoundingClientRect();
+  const x = e.clientX - rect.left;
+  const y = e.clientY - rect.top;
+  lx.value = `${x}px`;
+  ly.value = `${y}px`;
+}
 </script>
 
 <template>
@@ -58,19 +72,11 @@ const backgrounds = [
       <div class="hero-layout">
         <div class="art-container">
           <transition name="fade-up" mode="out-in">
-            <div
-              :key="selectedStyle"
-              class="art-box"
-              :style="{
-                borderColor: currentStyleData.color,
-                '--tint': currentStyleData.color,
-              }"
-            >
-              <img
-                :src="currentStyleData.art"
-                class="art-image"
-                :alt="selectedStyle"
-              />
+            <div :key="selectedStyle" class="art-box" :style="{
+              borderColor: currentStyleData.color,
+              '--tint': currentStyleData.color,
+            }">
+              <img :src="currentStyleData.art" class="art-image" :alt="selectedStyle" />
               <span class="label-bottom">{{ selectedStyle }} Style</span>
             </div>
           </transition>
@@ -79,12 +85,12 @@ const backgrounds = [
         <div class="info-container">
           <div class="header-block">
             <div class="header-top">
-              <div class="logo-mark animated-halftone">
-                <div class="halftone-overlay"></div>
+              <div ref="logoMark" class="logo-mark animated-halftone" @mousemove="handleLogoMouse">
+                <HalftoneLayer class="halftone-idle" mode="idle" dot-size="33.33%" />
+                <HalftoneLayer class="halftone-hover" mode="mouse" :x="lx" :y="ly" dot-size="33.33%" />
+
                 <div style="position: relative; z-index: 1">
-                  <div
-                    class="i-mdi-chevron-triple-up text-3xl text-white"
-                  ></div>
+                  <div class="text-3xl text-white"></div>
                 </div>
               </div>
               <h1 class="title-main">Commissions</h1>
@@ -94,32 +100,20 @@ const backgrounds = [
 
           <div class="pricing-matrix">
             <div class="styles-selector">
-              <button
-                v-for="style in pricing.styles"
-                :key="style.name"
-                class="style-btn"
-                :class="{ active: selectedStyle === style.name }"
-                @click="selectedStyle = style.name"
-              >
+              <button v-for="style in pricing.styles" :key="style.name" class="style-btn"
+                :class="{ active: selectedStyle === style.name }" @click="selectedStyle = style.name">
                 {{ style.name }}
                 <div class="btn-shadow"></div>
               </button>
             </div>
 
             <div class="sub-box crops-box">
-              <div
-                v-for="crop in pricing.crops"
-                :key="crop.name"
-                class="crop-row"
-              >
+              <div v-for="crop in pricing.crops" :key="crop.name" class="crop-row">
                 <span class="crop-name">{{ crop.name }}</span>
                 <span class="crop-separator">—</span>
                 <transition name="price-fade" mode="out-in">
-                  <span
-                    :key="selectedStyle"
-                    class="crop-value text-cyan-shine"
-                    >{{ getStylePrice(crop.basePrice) }}</span
-                  >
+                  <span :key="selectedStyle" class="crop-value text-cyan-shine">{{ getStylePrice(crop.basePrice)
+                  }}</span>
                 </transition>
               </div>
             </div>
@@ -167,19 +161,13 @@ const backgrounds = [
 
       <div class="photo-deck" @click="shufflePaintings">
         <transition-group name="deck-flip">
-          <div
-            v-for="(img, idx) in paintingStack"
-            :key="img"
-            class="photo-wrap"
-            :class="{ 'is-top': idx === paintingStack.length - 1 }"
-            :style="{
+          <div v-for="(img, idx) in paintingStack" :key="img" class="photo-wrap"
+            :class="{ 'is-top': idx === paintingStack.length - 1 }" :style="{
               zIndex: idx,
-              transform: `rotate(${idx * 4 - 4}deg) translateX(${
-                idx * 15 - 15
-              }px)`,
+              transform: `rotate(${(idx - (paintingStack.length - 1)) * 2
+                }deg) translateX(${(idx - (paintingStack.length - 1)) * 5}px)`,
               pointerEvents: idx === paintingStack.length - 1 ? 'auto' : 'none',
-            }"
-          >
+            }">
             <img :src="img" class="spread-img" />
           </div>
         </transition-group>
@@ -228,11 +216,9 @@ const backgrounds = [
   justify-content: center;
   position: relative;
   overflow: hidden;
-  background: color-mix(
-    in srgb,
-    var(--tint, var(--bg-card-alt)) 15%,
-    var(--bg-card-alt)
-  );
+  background: color-mix(in srgb,
+      var(--tint, var(--bg-card-alt)) 15%,
+      var(--bg-card-alt));
 }
 
 .art-image {
@@ -247,7 +233,7 @@ const backgrounds = [
   left: 0;
   right: 0;
   background: var(--border-color);
-  color:white;
+  color: white;
   padding: 0.6rem;
   text-align: center;
   font-weight: 1000;
@@ -261,8 +247,28 @@ const backgrounds = [
   flex-direction: column;
 }
 
+.logo-mark {
+  width: 60px;
+  height: 60px;
+  background: var(--halftone-bg);
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 3px solid var(--border-color);
+  box-shadow: 4px 4px 0px 0px var(--border-color);
+  box-sizing: content-box;
+}
+
 .header-block {
   margin-bottom: 2rem;
+}
+
+.header-top {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
 }
 
 .title-main {
@@ -366,10 +372,12 @@ const backgrounds = [
 .crop-name {
   text-align: left;
 }
+
 .crop-separator {
   text-align: center;
   color: var(--text-primary);
 }
+
 .crop-value {
   text-align: left;
 }
@@ -437,6 +445,7 @@ const backgrounds = [
   border: 4px solid var(--border-color);
   box-shadow: 8px 8px 0px 0px var(--border-color);
   transition: all 0.3s ease;
+  min-width: 0;
 }
 
 .anim-title {
@@ -513,6 +522,7 @@ const backgrounds = [
 .short {
   width: 120px;
 }
+
 .long {
   width: 400px;
 }
@@ -533,10 +543,16 @@ const backgrounds = [
   width: 320px;
   height: 400px;
   border: 12px solid white;
-  box-shadow: 0 10px 40px -5px rgba(0, 0, 0, 0.4);
   transition: all 0.3s cubic-bezier(0.23, 1, 0.32, 1);
   overflow: hidden;
-  background: #eee;
+  background: white;
+  will-change: transform, z-index;
+  backface-visibility: hidden;
+  transform-style: preserve-3d;
+}
+
+.photo-wrap.is-top {
+  box-shadow: 0 10px 40px -5px rgba(0, 0, 0, 0.4);
 }
 
 .spread-img {
@@ -544,6 +560,7 @@ const backgrounds = [
   height: 100%;
   object-fit: cover;
   pointer-events: none;
+  image-rendering: auto;
 }
 
 .photo-wrap.is-top:hover {
@@ -578,10 +595,12 @@ const backgrounds = [
     transform: translate(0, 0) rotate(0deg);
     opacity: 1;
   }
+
   60% {
     transform: translate(280px, -40px) rotate(15deg);
     opacity: 1;
   }
+
   100% {
     transform: translate(0, 20px) rotate(0deg);
     opacity: 0.2;
@@ -593,20 +612,46 @@ const backgrounds = [
     opacity: 0;
     transform: scale(0.95);
   }
+
   100% {
     opacity: 1;
     transform: scale(1);
   }
 }
 
+.animated-halftone {
+  position: relative;
+  overflow: hidden;
+}
+
+.halftone-idle {
+  opacity: var(--halftone-opacity);
+  transition: opacity 0.5s ease;
+}
+
+.halftone-hover {
+  opacity: 0;
+  transition: opacity 0.5s ease;
+}
+
+.logo-mark:hover .halftone-idle {
+  opacity: 0;
+}
+
+.logo-mark:hover .halftone-hover {
+  opacity: var(--halftone-opacity);
+}
+
 .fade-up-enter-active,
 .fade-up-leave-active {
   transition: all 0.4s ease;
 }
+
 .fade-up-enter-from {
   opacity: 0;
   transform: translateY(20px);
 }
+
 .fade-up-leave-to {
   opacity: 0;
   transform: translateY(-20px);
@@ -616,6 +661,7 @@ const backgrounds = [
 .price-fade-leave-active {
   transition: all 0.3s ease;
 }
+
 .price-fade-enter-from,
 .price-fade-leave-to {
   opacity: 0;
@@ -626,16 +672,20 @@ const backgrounds = [
   .hero-layout {
     grid-template-columns: 1fr;
   }
+
   .pricing-matrix {
     grid-template-columns: 1fr;
   }
+
   .art-box {
     height: 480px;
   }
+
   .painting-layout {
     grid-template-columns: 1fr;
     gap: 4rem;
   }
+
   .photo-deck {
     margin: 0 auto;
   }
@@ -646,9 +696,11 @@ const backgrounds = [
     grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: 1.5rem;
   }
+
   .title-huge {
     font-size: 5rem;
   }
+
   .title-main {
     font-size: 3.5rem;
   }
@@ -659,6 +711,7 @@ const backgrounds = [
     padding: 1.5rem;
     gap: 2rem;
   }
+
   .middle-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: 1rem;
@@ -699,20 +752,25 @@ const backgrounds = [
   .middle-grid {
     grid-template-columns: 1fr;
   }
+
   .crop-row {
     font-size: 1.5rem;
     grid-template-columns: 80px 30px 1fr;
   }
+
   .hero-layout {
     padding: 1.5rem;
   }
+
   .art-box {
     height: 320px;
   }
+
   .photo-deck {
     height: 350px;
     transform: scale(0.8);
   }
+
   .photo-wrap {
     width: 240px;
     height: 300px;

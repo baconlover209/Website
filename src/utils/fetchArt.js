@@ -1,30 +1,30 @@
 export async function fetchArt(tag) {
     try {
-        // Fetch the JSON data
-        const response = await fetch('/src/art.json'); // Ensure the path is correct
+        // fetch the JSON data
+        const response = await fetch('/art.json');
         if (!response.ok) {
             throw new Error(`Failed to fetch art.json. HTTP status: ${response.status}`);
         }
 
         const data = await response.json();
-        const pieces = data.data.pieces; // Extract pieces
-        const tags = data.data.tags; // Extract tags
+        const pieces = data.data.pieces;
+        const tags = data.data.tags;
 
-        // If no tag is provided, return all pieces
+        // if no tag is provided, return all pieces and the tags mapping
         if (!tag) {
-            return { pieces };
+            return { pieces, tags };
         }
 
-        // Find the tag object that matches the provided tag
+        // find the tag object that matches the provided tag
         const tagObject = tags.find(item => Object.keys(item)[0] === tag);
         if (!tagObject) {
             throw new Error(`Tag "${tag}" not found in tags.`);
         }
 
-        // Get the list of IDs associated with the tag
+        // get the list of IDs associated with the tag
         const tagIds = tagObject[tag];
 
-        // Filter pieces based on the tag IDs
+        // filter pieces based on the tag IDs
         const filteredPieces = pieces.filter(piece => tagIds.includes(parseInt(piece.id, 10)));
 
         return { pieces: filteredPieces };

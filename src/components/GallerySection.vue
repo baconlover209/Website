@@ -4,26 +4,25 @@ import ImageView from "@/components/modals/ImageView.vue";
 import { fetchArt } from "@/utils/fetchArt";
 import { onMounted, ref } from "vue";
 
-var galleryItems = ref([]);
+const galleryItems = ref([]);
 
 onMounted(async () => {
-    try {
-        const data = await fetchArt("homepage");
-        galleryItems.value = data.pieces; // Assign the "pieces" array from the JSON
-        console.log(galleryItems);
-    } catch (error) {
-        console.error('Error loading gallery items:', error);
-    }
+  try {
+    const data = await fetchArt("homepage");
+    galleryItems.value = data.pieces;
+  } catch (error) {
+    console.error("Error loading gallery items:", error);
+  }
 });
 
-const featureFullArtRef = "/art/sfdfsdsdfsfdfsvdvds.webp"
+const featureFullArtRef = "/art/sfdfsdsdfsfdfsvdvds.webp";
 
 function closeImage() {
-    selectedImage.value = null;
+  selectedImage.value = null;
 }
 
 function openImage(image) {
-    selectedImage.value = image;
+  selectedImage.value = image;
 }
 
 const selectedImage = ref(null);
@@ -33,14 +32,16 @@ const selectedImage = ref(null);
   <div class="h-100%">
     <div class="gallery-layout">
       <div class="feature-box">
-        <img :src="artUrl" class="feature-img" @click="openImage({img:featureFullArtRef})"/>
+        <img :src="artUrl" class="feature-img" @click="openImage({ img: featureFullArtRef })" fetchpriority="high"
+          loading="eager" />
         <div class="feature-badge">FEATURED</div>
       </div>
 
       <div class="thumbnails-row overflow-x-scroll hide-scrollbar">
-        <div v-for="item in galleryItems" :key="item.id" class="thumb-square">
+        <div v-for="item in galleryItems" :key="item.id" class="thumb-square-link">
           <div class="thumb-inner flex items-center justify-center">
-            <img :src="item.img" class="thumb-square" :alt="item.name" @click="openImage(item)"/>
+            <img :src="item.img" class="thumb-img" :alt="item.name" @click="openImage(item)" fetchpriority="high"
+              loading="eager" />
           </div>
         </div>
       </div>
@@ -84,14 +85,13 @@ const selectedImage = ref(null);
   font-family: "Outfit", sans-serif;
   border-radius: 4px;
   overflow: hidden;
-  /* For shine effect */
   position: absolute;
-  transform: translate(0,0px);
+  transform: translate(0, 0px);
   transition: transform 0.5s cubic-bezier(0.075, 0.82, 0.165, 1);
 }
 
 .feature-badge:hover {
-  transform: translate(0,-5px);
+  transform: translate(0, -5px);
   transition: transform 0.5s cubic-bezier(0.075, 0.82, 0.165, 1);
 }
 
@@ -102,15 +102,18 @@ const selectedImage = ref(null);
   left: -75%;
   width: 60%;
   height: 200%;
-  background: linear-gradient(120deg, rgba(255,255,255,0.0) 0%, rgba(255,255,255,0.5) 50%, rgba(255,255,255,0.0) 100%);
+  background: linear-gradient(120deg,
+      rgba(255, 255, 255, 0) 0%,
+      rgba(255, 255, 255, 0.5) 50%,
+      rgba(255, 255, 255, 0) 100%);
   transform: skewX(-25deg);
-  transition: transform 0.6s cubic-bezier(.4,1.6,.6,1);
+  transition: transform 0.6s cubic-bezier(0.4, 1.6, 0.6, 1);
   pointer-events: none;
 }
 
 .feature-badge:hover::before {
   transform: translateX(300%) skewX(-25deg);
-  transition: transform 0.6s cubic-bezier(.4,1.6,.6,1);
+  transition: transform 0.6s cubic-bezier(0.4, 1.6, 0.6, 1);
 }
 
 .thumbnails-row {
@@ -120,19 +123,26 @@ const selectedImage = ref(null);
   padding-top: 4px;
 }
 
-.thumb-square {
+.thumb-square-link {
   aspect-ratio: 1/1;
   height: 100%;
-  border: 3px solid var(--border-color);
+  border: 4px solid var(--border-color);
   background: var(--bg-card);
   padding: 4px;
   cursor: pointer;
-  transition: transform 0.2s;
+  transition: transform 0.2s, background 0.2s;
 }
 
-.thumb-square:hover {
+.thumb-square-link:hover {
   transform: translateY(-4px);
   background: var(--accent);
+}
+
+.thumb-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
 }
 
 .thumb-inner {
@@ -140,12 +150,14 @@ const selectedImage = ref(null);
   height: 100%;
   border: 2px solid var(--border-color);
   background: var(--bg-card-alt);
+  overflow: hidden;
 }
 
 .hide-scrollbar::-webkit-scrollbar {
   display: none;
 }
-.hide-scrollbar{
+
+.hide-scrollbar {
   scrollbar-width: none;
 }
 </style>

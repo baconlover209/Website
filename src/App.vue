@@ -2,11 +2,14 @@
 import { onMounted, onUnmounted, ref, watch } from "vue";
 import { useRoute } from "vue-router";
 import { preloadImages } from "./utils/preloader";
+import { fetchArt } from "./utils/fetchArt";
 import avatarUrl from "./assets/pfp.webp";
 import charUrl from "./assets/character.webp";
 import ProfileSidebar from "./components/ProfileSidebar.vue";
 import BioSection from "./components/BioSection.vue";
 import ThemeToggle from "./components/ThemeToggle.vue";
+import SlideshowPlayer from "./components/SlideshowPlayer.vue";
+import HalftoneLayer from "./components/HalftoneLayer.vue";
 
 const navLinks = [
   { name: "Home", path: "/" },
@@ -15,60 +18,66 @@ const navLinks = [
   { name: "Comms", path: "/commissions" },
 ];
 
-const allArt = [
-  "/art/bedrot.webp",
-  "/art/fdsdffdfd.webp",
-  "/art/limebih.webp",
-  "/art/wdwdwddwfgghhh.webp",
-  "/art/EVIL2.webp",
-  "/art/sfdfsdsdfsfdfsvdvds.webp",
-  "/art/aeroero22.webp",
-  "/art/Erowoak.webp",
-  "/art/G2B8JGoWEAA1IEw.webp",
-  "/art/G8TcZLMWEAA5qz9.webp",
-  avatarUrl,
-  charUrl,
-];
-
-function updateMouse(e) {
-  document.documentElement.style.setProperty("--mx", `${e.clientX}px`);
-  document.documentElement.style.setProperty("--my", `${e.clientY}px`);
-}
-
-onMounted(() => {
-  window.addEventListener("mousemove", updateMouse);
-  // preload all art assets immediately
-  preloadImages(allArt).then(() => {
-    console.log("Art assets cached and ready");
-  });
-});
-
 const route = useRoute();
 const isMobileBioOpen = ref(false);
+const isSlideshowActive = ref(false);
+const allPieces = ref([]);
+const slideshowIds = ref([]);
+
+const mx = ref("50%");
+const my = ref("50%");
+
+function updateGlobalMouse(e) {
+  mx.value = `${e.clientX}px`;
+  my.value = `${e.clientY}px`;
+  document.documentElement.style.setProperty("--mx", mx.value);
+  document.documentElement.style.setProperty("--my", my.value);
+}
+
+const toggleSlideshow = () => {
+  isSlideshowActive.value = !isSlideshowActive.value;
+};
+
+onMounted(async () => {
+  window.addEventListener("mousemove", updateGlobalMouse);
+
+  try {
+    const { pieces, tags } = await fetchArt();
+    allPieces.value = pieces;
+
+    const slideshowTag = tags.find((t) => t.slideshow);
+    if (slideshowTag) {
+      slideshowIds.value = slideshowTag.slideshow;
+    }
+
+    const pieceUrls = pieces.map((p) => p.img);
+    const assetsToPreload = [...pieceUrls, avatarUrl, charUrl];
+
+    preloadImages(assetsToPreload);
+  } catch (err) {
+    console.error("Failed to preload art:", err);
+  }
+});
 
 watch(
   () => route.path,
   () => {
     isMobileBioOpen.value = false;
+    isSlideshowActive.value = false;
   }
 );
 
 onUnmounted(() => {
-  window.removeEventListener("mousemove", updateMouse);
+  window.removeEventListener("mousemove", updateGlobalMouse);
 });
 </script>
 
 <template>
-  <div class="app-layout">
+  <div class="app-layout" :class="{ 'slideshow-mode': isSlideshowActive }">
     <header class="top-navbar">
       <nav class="nav-links">
-        <RouterLink
-          v-for="link in navLinks"
-          :key="link.name"
-          :to="link.path"
-          class="nav-item"
-          active-class="nav-active"
-        >
+        <RouterLink v-for="link in navLinks" :key="link.name" :to="link.path" class="nav-item"
+          active-class="nav-active">
           {{ link.name }}
         </RouterLink>
       </nav>
@@ -78,29 +87,24 @@ onUnmounted(() => {
     </header>
 
     <div class="main-container">
-      <aside class="left-column">
-        <div class="sidebar-header animated-halftone">
-          <div class="halftone-overlay"></div>
-          <div style="position: relative; z-index: 1">
-            <ProfileSidebar />
+      <aside class="left-column" :class="{ 'expanded-halftone': isSlideshowActive }">
+        <div class="sidebar-header animated-halftone" @click="toggleSlideshow" style="cursor: pointer"
+          title="Toggle Relax Mode">
+          <div class="inner-glow"></div>
+          <HalftoneLayer class="halftone-idle" mode="idle" :mask-stop="isSlideshowActive ? '-50%' : '0%'">
+          </HalftoneLayer>
+          <HalftoneLayer class="halftone-hover" mode="mouse" :x="mx" :y="my"
+            :mask-stop="isSlideshowActive ? '-50%' : '0%'" />
+
+          <div class="sidebar-content-wrapper" :class="{ 'full-height': isSlideshowActive }">
+            <ProfileSidebar :is-slideshow-active="isSlideshowActive" />
           </div>
-          <button
-            class="mobile-bio-toggle"
-            @click="isMobileBioOpen = !isMobileBioOpen"
-            aria-label="Toggle Bio"
-          >
-            <div
-              class="icon-toggle"
-              :class="
-                isMobileBioOpen ? 'i-mdi-chevron-up' : 'i-mdi-chevron-down'
-              "
-            ></div>
+          <button class="mobile-bio-toggle" @click.stop="isMobileBioOpen = !isMobileBioOpen" aria-label="Toggle Bio">
+            <div class="icon-toggle" :class="isMobileBioOpen ? 'i-mdi-chevron-up' : 'i-mdi-chevron-down'
+              "></div>
           </button>
         </div>
-        <div
-          class="sidebar-body"
-          :class="{ 'mobile-hidden': !isMobileBioOpen }"
-        >
+        <div class="sidebar-body" :class="{ 'mobile-hidden': !isMobileBioOpen }">
           <BioSection />
         </div>
       </aside>
@@ -111,6 +115,9 @@ onUnmounted(() => {
             <component :is="Component" />
           </transition>
         </RouterView>
+        <transition name="page-turn" mode="out-in">
+          <SlideshowPlayer v-if="isSlideshowActive" :all-pieces="allPieces" :slideshow-ids="slideshowIds" />
+        </transition>
       </main>
     </div>
   </div>
@@ -161,7 +168,7 @@ onUnmounted(() => {
   --badge-bg: var(--accent);
   --badge-text: #ffffff;
   --halftone-bg: #00ccec;
-  --halftone-opacity: 0.8;
+  --halftone-opacity: 0.9;
   --halftone-dot-color: #0ff;
 }
 
@@ -181,59 +188,10 @@ body {
   color: var(--text-primary);
 }
 
-@property --x {
-  syntax: "<length-percentage>";
-  initial-value: 50vw;
+@property --mask-stop {
+  syntax: "<percentage>";
+  initial-value: 0%;
   inherits: true;
-}
-
-@property --y {
-  syntax: "<length-percentage>";
-  initial-value: 50vh;
-  inherits: true;
-}
-
-@property --mx {
-  syntax: "<length-percentage>";
-  initial-value: 50vw;
-  inherits: true;
-}
-
-@property --my {
-  syntax: "<length-percentage>";
-  initial-value: 50vh;
-  inherits: true;
-}
-
-@property --ix {
-  syntax: "<length-percentage>";
-  initial-value: 50%;
-  inherits: true;
-}
-
-@property --iy {
-  syntax: "<length-percentage>";
-  initial-value: 50%;
-  inherits: true;
-}
-
-@keyframes drift {
-  0% {
-    --ix: 20%;
-    --iy: 20%;
-  }
-  30% {
-    --ix: 80%;
-    --iy: 20%;
-  }
-  60% {
-    --ix: 50%;
-    --iy: 80%;
-  }
-  100% {
-    --ix: 20%;
-    --iy: 20%;
-  }
 }
 
 .app-layout {
@@ -312,68 +270,96 @@ body {
 
 .left-column {
   flex: 0 0 600px;
-  display: flex;
-  flex-direction: column;
+  display: grid;
+  grid-template-rows: auto 1fr;
   border-right: 4px solid var(--sidebar-border);
   background: var(--bg-sidebar);
   z-index: 10;
   position: relative;
+  transition: grid-template-rows 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.left-column.expanded-halftone {
+  grid-template-rows: 1fr 0fr;
 }
 
 .sidebar-header {
+  grid-row: 1;
   padding: 2rem;
   border-bottom: 4px solid var(--sidebar-border);
   position: relative;
   overflow: hidden;
+  transition: all 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+  min-height: 50px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  mix-blend-mode: normal;
+}
+
+.expanded-halftone .sidebar-header {
+  border-bottom-color: transparent;
+  padding: 0;
+}
+
+.sidebar-content-wrapper {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  transition: all 0.8s ease;
+}
+
+.sidebar-body {
+  grid-row: 2;
+  overflow: hidden;
+  padding: 2rem;
+  transition: all 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.expanded-halftone .sidebar-body {
+  padding-top: 0;
+  padding-bottom: 0;
+  opacity: 0;
+}
+
+.inner-glow {
+  width: 100%;
+  height: 100%;
+  position: absolute;
+  z-index: 10000000000;
+  inset: 0;
+  opacity: 0.7;
+  box-shadow: 0px 0px 4rem var(--halftone-bg) inset;
+  mix-blend-mode: normal;
+  pointer-events: none;
 }
 
 .animated-halftone {
   background: var(--halftone-bg);
   position: relative;
   overflow: hidden;
-  animation: drift 10s infinite ease-in-out;
-  --x: var(--ix);
-  --y: var(--iy);
-  transition: 0.35s cubic-bezier(0.1, 0, 0.5, 1.5);
-  transition-property: --x, --y;
 }
 
-.animated-halftone:hover {
-  --x: var(--mx);
-  --y: var(--my);
-}
-
-.halftone-overlay {
-  position: absolute;
-  inset: 0;
-  pointer-events: none;
+.halftone-idle {
   opacity: var(--halftone-opacity);
-  mix-blend-mode: hard-light;
-  mask-image: linear-gradient(to top, transparent, black);
-  transform: translateZ(0);
+  transition: opacity 0.5s ease;
 }
 
-.halftone-overlay::before {
-  content: "";
-  position: absolute;
-  inset: 0;
-  --pattern: radial-gradient(closest-side, #777, #fff) 0/ 1em 1em space;
-  --map: radial-gradient(
-    circle farthest-corner at var(--x) var(--y),
-    #888,
-    #fff
-  );
-  background: var(--pattern), var(--map);
-  background-blend-mode: multiply;
-  filter: contrast(16) invert(1);
+.halftone-hover {
+  opacity: 0;
+  transition: opacity 0.5s ease;
 }
 
-.halftone-overlay::after {
-  content: "";
-  position: absolute;
-  inset: 0;
-  background-color: var(--halftone-dot-color);
-  mix-blend-mode: multiply;
+.sidebar-header:hover .halftone-idle {
+  opacity: 0;
+}
+
+.sidebar-header:hover .halftone-hover {
+  opacity: var(--halftone-opacity);
 }
 
 .sidebar-body {
@@ -393,7 +379,7 @@ body {
 
 .page-turn-enter-active,
 .page-turn-leave-active {
-  transition: all 0.55s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: all 0.45s cubic-bezier(0.4, 0, 0.2, 1);
   position: absolute;
   width: 100%;
   height: 100%;
@@ -423,7 +409,7 @@ body {
   pointer-events: none;
 }
 
-.right-column > * {
+.right-column>* {
   width: 100%;
   height: 100%;
   overflow-y: auto;
@@ -458,6 +444,7 @@ body {
 
   .sidebar-header {
     padding: 0.75rem;
+    height: 100px;
     display: flex;
     justify-content: center;
     align-items: center;

@@ -59,13 +59,39 @@
         "id": "10",
         "date": "1673222400",
         "name": "wdwdwdwdwfgghhh",
-        "img": "/art/wdwdwdwdwfgghhh.webp"
+        "img": "/art/wdwdwddwfgghhh.webp"
       }
     ],
     "tags": [
-      { "homepage": [1, 2, 3, 4, 5, 7, 10] },
-      { "slideshow": [1, 2, 3, 4, 5, 7, 10] },
-      { "comm_flipbook": [1, 2, 3] }
+      {
+        "homepage": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          7,
+          10
+        ]
+      },
+      {
+        "slideshow": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          7,
+          10
+        ]
+      },
+      {
+        "comm_flipbook": [
+          1,
+          2,
+          3
+        ]
+      }
     ]
   }
 }
