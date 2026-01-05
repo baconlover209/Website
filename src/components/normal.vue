@@ -29,16 +29,22 @@ const vsSource = `
 const fsSource = `
   precision mediump float;
   uniform vec2 u_resolution;
-  uniform vec2 u_mouse;
+  uniform vec2 u_mouse; // Now expected as 0.0 to 1.0
   uniform sampler2D u_normalMap;
   varying vec2 v_uv;
 
   void main() {
     vec4 texColor = texture2D(u_normalMap, v_uv);
     vec3 N = normalize(texColor.rgb * 2.0 - 1.0);
-    vec3 lightPos = vec3(u_mouse.x, u_mouse.y, 120.0);
-    vec3 pixelPos = vec3(gl_FragCoord.x, u_resolution.y - gl_FragCoord.y, 0.0);
+
+    // Use v_uv (the current pixel's 0-1 pos) instead of gl_FragCoord
+    // We multiply by aspect ratio if you want a perfect circle, 
+    // but for simple following, v_uv vs u_mouse is most direct.
+    vec3 lightPos = vec3(u_mouse.x, u_mouse.y, 0.5); 
+    vec3 pixelPos = vec3(v_uv.x, v_uv.y, 0.0);
+    
     vec3 L = normalize(lightPos - pixelPos);
+    
     float diffuse = max(dot(N, L), 0.0);
     float intensity = pow(diffuse, 5.0); 
     gl_FragColor = vec4(vec3(intensity), 1.0);
@@ -129,9 +135,11 @@ function resize() {
 
 function onMoveMouse(e) {
   const rect = canvasRef.value.getBoundingClientRect();
-  const dpr = window.devicePixelRatio || 1;
-  mouseX = (e.clientX - rect.left) * dpr;
-  mouseY = (e.clientY - rect.top) * dpr;
+  
+  // Calculate 0.0 to 1.0 position relative to the element
+  mouseX = (e.clientX - rect.left) / rect.width *2 -.5;
+  mouseY = (e.clientY - rect.top) / rect.height  *2 -.5;
+  
   render();
 }
 
@@ -167,7 +175,6 @@ function createShader(gl, type, source) {
 .avatar-img {
   display: block;
   width: 100%;
-  max-width: 800px; /* Adjust as needed */
   height: auto;
 }
 
@@ -175,7 +182,7 @@ function createShader(gl, type, source) {
   position: absolute;
   inset: 0;
   mix-blend-mode: hard-light;
-  filter: sepia(.5) saturate(150%) hue-rotate(110deg);
+  filter: sepia(.5) saturate(500%) hue-rotate(160deg) ;
   transition: opacity 1.5s cubic-bezier(0.23, 1, 0.320, 1);
   opacity: 0%;
 }
