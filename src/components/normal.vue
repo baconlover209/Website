@@ -1,21 +1,32 @@
 <script setup>
-import { useTemplateRef, onMounted, onUnmounted } from 'vue';
+import { useTemplateRef, onMounted, onUnmounted, ref } from 'vue';
 
 const props = defineProps({
   normalImg: String,
   diffuseImg: String,
+  lightColor: {
+    type: String,
+    default: '#f78fc4'
+  }
 });
 
-const canvasRef = useTemplateRef("light");
-const diffuseRef = useTemplateRef("diffuse");
+const canvasRef = useTemplateRef("canvas");
+const containerRef = useTemplateRef("container");
 
 let gl;
 let program;
-let uResolution, uMouse;
-let width = 0, height = 0;
-let mouseX = 0, mouseY = 0;
+let uResolution, uMouse, uLightColor, uStrength;
+let uDiffuseMap, uNormalMap;
 
-// SHADERS
+let strength = 0;
+let targetStrength = 0;
+let animationFrameId;
+let mouseX = 0.5;
+let mouseY = 0.5;
+
+let diffuseTexture, normalTexture;
+let imgAspect = 1;
+
 const vsSource = `
   attribute vec2 a_position;
   varying vec2 v_uv;
@@ -29,25 +40,45 @@ const vsSource = `
 const fsSource = `
   precision mediump float;
   uniform vec2 u_resolution;
-  uniform vec2 u_mouse; // Now expected as 0.0 to 1.0
+  uniform vec2 u_mouse; 
+  uniform vec3 u_lightColor;
+  uniform float u_strength; // 0.0 to 1.0
+  
+  uniform sampler2D u_diffuseMap;
   uniform sampler2D u_normalMap;
+  
   varying vec2 v_uv;
 
   void main() {
-    vec4 texColor = texture2D(u_normalMap, v_uv);
-    vec3 N = normalize(texColor.rgb * 2.0 - 1.0);
-
-    // Use v_uv (the current pixel's 0-1 pos) instead of gl_FragCoord
-    // We multiply by aspect ratio if you want a perfect circle, 
-    // but for simple following, v_uv vs u_mouse is most direct.
-    vec3 lightPos = vec3(u_mouse.x, u_mouse.y, 0.5); 
-    vec3 pixelPos = vec3(v_uv.x, v_uv.y, 0.0);
+    vec4 diffuseColor = texture2D(u_diffuseMap, v_uv);
+    vec4 normalColor = texture2D(u_normalMap, v_uv);
+    
+    // unpack normal
+    vec3 N = normalize(normalColor.rgb * 2.0 - 1.0);
+    
+    // correct for aspect ratio
+    float aspect = u_resolution.x / u_resolution.y;
+  
+    vec2 mouse = vec2(u_mouse.x, u_mouse.y);
+    
+    vec3 lightPos = vec3(mouse.x * aspect, mouse.y, 0.2); 
+    vec3 pixelPos = vec3(v_uv.x * aspect, v_uv.y, 0.0);
     
     vec3 L = normalize(lightPos - pixelPos);
     
-    float diffuse = max(dot(N, L), 0.0);
-    float intensity = pow(diffuse, 5.0); 
-    gl_FragColor = vec4(vec3(intensity), 1.0);
+    // lighting calculation
+    float NdotL = max(dot(N, L), 0.0);
+    float falloff = pow(NdotL, 3.0); // Broader beam (was 5.0)
+    
+    vec3 ambient = vec3(0.85); 
+    // light contribution
+    vec3 lighting = falloff * u_lightColor * 2.5; // Less bright (was 5.0)
+    
+    vec3 litRGB = diffuseColor.rgb * (ambient + lighting);
+
+    vec3 finalRGB = mix(diffuseColor.rgb, litRGB, u_strength);
+    
+    gl_FragColor = vec4(finalRGB, diffuseColor.a);
   }
 `;
 
@@ -56,41 +87,33 @@ onMounted(async () => {
   gl = canvas.getContext("webgl");
   if (!gl) return;
 
-  // 1. Initialize Shaders and Buffers
   initGL();
 
-  // 2. Wait for the normal image to be fully ready
-  await preloadImage(props.normalImg);
+  // Load textures
+  await Promise.all([
+    loadTexture(gl, props.diffuseImg, true).then(t => diffuseTexture = t),
+    loadTexture(gl, props.normalImg, false).then(t => normalTexture = t)
+  ]);
 
-  // 3. Setup Texture and Initial Size
-  resize();
-  window.addEventListener("resize", resize);
-  
-  // Set initial mouse position to center
-  mouseX = canvas.width / 2;
-  mouseY = canvas.height / 2;
-  render();
+  // bind textures to units
+  gl.activeTexture(gl.TEXTURE0);
+  gl.bindTexture(gl.TEXTURE_2D, diffuseTexture);
+  gl.uniform1i(uDiffuseMap, 0);
+
+  gl.activeTexture(gl.TEXTURE1);
+  gl.bindTexture(gl.TEXTURE_2D, normalTexture);
+  gl.uniform1i(uNormalMap, 1);
+
+  const ro = new ResizeObserver(resize);
+  ro.observe(containerRef.value);
+
+  // start loop
+  tick();
 });
 
-onUnmounted(() => window.removeEventListener("resize", resize));
-
-// Helper to ensure image is loaded before WebGL touches it
-function preloadImage(url) {
-  return new Promise((resolve) => {
-    const img = new Image();
-    img.crossOrigin = "anonymous";
-    img.onload = () => {
-      const texture = gl.createTexture();
-      gl.bindTexture(gl.TEXTURE_2D, texture);
-      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
-      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
-      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
-      gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, img);
-      resolve();
-    };
-    img.src = url;
-  });
-}
+onUnmounted(() => {
+  cancelAnimationFrame(animationFrameId);
+});
 
 function initGL() {
   const vs = createShader(gl, gl.VERTEX_SHADER, vsSource);
@@ -103,7 +126,7 @@ function initGL() {
 
   const buffer = gl.createBuffer();
   gl.bindBuffer(gl.ARRAY_BUFFER, buffer);
-  gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1,-1, 1,-1, -1,1, -1,1, 1,-1, 1,1]), gl.STATIC_DRAW);
+  gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1, -1, 1, -1, -1, 1, -1, 1, 1, -1, 1, 1]), gl.STATIC_DRAW);
 
   const pos = gl.getAttribLocation(program, "a_position");
   gl.enableVertexAttribArray(pos);
@@ -111,42 +134,92 @@ function initGL() {
 
   uResolution = gl.getUniformLocation(program, "u_resolution");
   uMouse = gl.getUniformLocation(program, "u_mouse");
+  uLightColor = gl.getUniformLocation(program, "u_lightColor");
+  uStrength = gl.getUniformLocation(program, "u_strength");
+  uDiffuseMap = gl.getUniformLocation(program, "u_diffuseMap");
+  uNormalMap = gl.getUniformLocation(program, "u_normalMap");
+}
+
+function loadTexture(gl, url, isDiffuse) {
+  return new Promise(resolve => {
+    const img = new Image();
+    img.crossOrigin = "anonymous";
+    img.onload = () => {
+      if (isDiffuse) {
+        imgAspect = img.height / img.width;
+        resize();
+      }
+
+      const tex = gl.createTexture();
+      gl.bindTexture(gl.TEXTURE_2D, tex);
+      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
+      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
+      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
+      gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, img);
+      resolve(tex);
+    };
+    img.src = url;
+  });
 }
 
 function resize() {
+  if (!canvasRef.value || !containerRef.value) return;
+  const container = containerRef.value;
   const canvas = canvasRef.value;
-  const diffuse = diffuseRef.value;
-  if (!canvas || !diffuse) return;
 
-  const rect = diffuse.getBoundingClientRect();
+  const displayWidth = container.clientWidth;
+  const displayHeight = displayWidth * imgAspect;
+
   const dpr = window.devicePixelRatio || 1;
+  canvas.width = displayWidth * dpr;
+  canvas.height = displayHeight * dpr;
 
-  width = rect.width * dpr;
-  height = rect.height * dpr;
-  canvas.width = width;
-  canvas.height = height;
-  canvas.style.width = `${rect.width}px`;
-  canvas.style.height = `${rect.height}px`;
+  canvas.style.width = displayWidth + 'px';
+  canvas.style.height = displayHeight + 'px';
 
-  gl.viewport(0, 0, width, height);
-  gl.uniform2f(uResolution, width, height);
-  render();
+  gl.viewport(0, 0, canvas.width, canvas.height);
+  gl.uniform2f(uResolution, canvas.width, canvas.height);
 }
 
 function onMoveMouse(e) {
+  if (!canvasRef.value) return;
   const rect = canvasRef.value.getBoundingClientRect();
-  
-  // Calculate 0.0 to 1.0 position relative to the element
-  mouseX = (e.clientX - rect.left) / rect.width *2 -.5;
-  mouseY = (e.clientY - rect.top) / rect.height  *2 -.5;
-  
+  mouseX = (e.clientX - rect.left) / rect.width;
+  mouseY = (e.clientY - rect.top) / rect.height;
+}
+
+function onEnter() {
+  targetStrength = 1.0;
+}
+function onLeave() {
+  targetStrength = 0.0;
+}
+
+function tick() {
+  strength += (targetStrength - strength) * 0.05;
+
   render();
+  animationFrameId = requestAnimationFrame(tick);
 }
 
 function render() {
-  if (!gl) return;
+  if (!gl || !program) return;
+
   gl.uniform2f(uMouse, mouseX, mouseY);
+  gl.uniform1f(uStrength, strength);
+
+  const rgb = hexToRgb(props.lightColor);
+  gl.uniform3f(uLightColor, rgb[0], rgb[1], rgb[2]);
+
   gl.drawArrays(gl.TRIANGLES, 0, 6);
+}
+
+function hexToRgb(hex) {
+  let c = hex.substring(1);
+  if (c.length === 3) c = c.split('').map(char => char + char).join('');
+  const bigInt = parseInt(c, 16);
+  return [(bigInt >> 16 & 255) / 255, (bigInt >> 8 & 255) / 255, (bigInt & 255) / 255];
 }
 
 function createShader(gl, type, source) {
@@ -158,9 +231,8 @@ function createShader(gl, type, source) {
 </script>
 
 <template>
-  <div class="scene" @mousemove="onMoveMouse">
-    <img ref="diffuse" :src="diffuseImg" class="avatar-img" crossorigin="anonymous">
-    <canvas ref="light" class="light"></canvas>
+  <div ref="container" class="scene" @mousemove="onMoveMouse" @mouseenter="onEnter" @mouseleave="onLeave">
+    <canvas ref="canvas"></canvas>
   </div>
 </template>
 
@@ -168,26 +240,12 @@ function createShader(gl, type, source) {
 .scene {
   position: relative;
   display: inline-block;
-  line-height: 0;
-  cursor: none; /* Optional: hides cursor for better effect */
-}
-
-.avatar-img {
-  display: block;
   width: 100%;
-  height: auto;
+  line-height: 0;
+  cursor: none;
 }
 
-.light {
-  position: absolute;
-  inset: 0;
-  mix-blend-mode: hard-light;
-  filter: sepia(.5) saturate(500%) hue-rotate(160deg) ;
-  transition: opacity 1.5s cubic-bezier(0.23, 1, 0.320, 1);
-  opacity: 0%;
-}
-
-.light:hover{
-  opacity: 60%;
+canvas {
+  display: block;
 }
 </style>
