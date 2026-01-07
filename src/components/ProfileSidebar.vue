@@ -54,7 +54,7 @@ const formatDate = (date) => {
       <transition name="fade" mode="out-in">
         <div v-if="!isSlideshowActive" key="profile" class="profile-content">
           <div ref="card" class="avatar-frame" @mousemove="handleMouseMove">
-            <normal normal-img="normal.png" diffuse-img="Wl2FTZtAa0QE2gigbTXPRnZEI_lgrJ5HdzfmTh6axoGI4f2D4k-ezgif.com-video-to-gif-converter - Copy.gif"/>
+            <normal normal-img="normal.png" diffuse-img="pfp.webm" />
           </div>
           <h1 class="name-title">DART</h1>
         </div>

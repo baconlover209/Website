@@ -1,5 +1,5 @@
 <script setup>
-import { useTemplateRef, onMounted, onUnmounted, ref } from 'vue';
+import { useTemplateRef, onMounted, onUnmounted, ref, computed } from 'vue';
 
 const props = defineProps({
   normalImg: String,
@@ -12,6 +12,8 @@ const props = defineProps({
 
 const canvasRef = useTemplateRef("canvas");
 const containerRef = useTemplateRef("container");
+const mediaRef = useTemplateRef("media");
+const isReady = ref(false);
 
 let gl;
 let program;
@@ -25,7 +27,14 @@ let mouseX = 0.5;
 let mouseY = 0.5;
 
 let diffuseTexture, normalTexture;
+let diffuseSource = null;
 let imgAspect = 1;
+
+const isVideo = computed(() => {
+  if (!props.diffuseImg) return false;
+  const ext = props.diffuseImg.split('.').pop().toLowerCase().split('?')[0];
+  return ['mp4', 'webm'].includes(ext);
+});
 
 const vsSource = `
   attribute vec2 a_position;
@@ -68,11 +77,11 @@ const fsSource = `
     
     // lighting calculation
     float NdotL = max(dot(N, L), 0.0);
-    float falloff = pow(NdotL, 3.0); // Broader beam (was 5.0)
+    float falloff = pow(NdotL, 3.0); 
     
     vec3 ambient = vec3(0.85); 
     // light contribution
-    vec3 lighting = falloff * u_lightColor * 2.5; // Less bright (was 5.0)
+    vec3 lighting = falloff * u_lightColor * 2.5; 
     
     vec3 litRGB = diffuseColor.rgb * (ambient + lighting);
 
@@ -90,22 +99,35 @@ onMounted(async () => {
   initGL();
 
   // Load textures
-  await Promise.all([
-    loadTexture(gl, props.diffuseImg, true).then(t => diffuseTexture = t),
-    loadTexture(gl, props.normalImg, false).then(t => normalTexture = t)
-  ]);
+  try {
+    const [dTex, nTex] = await Promise.all([
+      loadSource(gl, props.diffuseImg, true),
+      loadSource(gl, props.normalImg, false)
+    ]);
+    diffuseTexture = dTex;
+    normalTexture = nTex;
 
-  // bind textures to units
-  gl.activeTexture(gl.TEXTURE0);
-  gl.bindTexture(gl.TEXTURE_2D, diffuseTexture);
-  gl.uniform1i(uDiffuseMap, 0);
+    requestAnimationFrame(() => {
+      isReady.value = true;
+    });
+  } catch (e) {
+    console.error("Failed to load textures", e);
+  }
 
-  gl.activeTexture(gl.TEXTURE1);
-  gl.bindTexture(gl.TEXTURE_2D, normalTexture);
-  gl.uniform1i(uNormalMap, 1);
+  if (diffuseTexture) {
+    gl.activeTexture(gl.TEXTURE0);
+    gl.bindTexture(gl.TEXTURE_2D, diffuseTexture);
+    gl.uniform1i(uDiffuseMap, 0);
+  }
+
+  if (normalTexture) {
+    gl.activeTexture(gl.TEXTURE1);
+    gl.bindTexture(gl.TEXTURE_2D, normalTexture);
+    gl.uniform1i(uNormalMap, 1);
+  }
 
   const ro = new ResizeObserver(resize);
-  ro.observe(containerRef.value);
+  if (containerRef.value) ro.observe(containerRef.value);
 
   // start loop
   tick();
@@ -113,6 +135,11 @@ onMounted(async () => {
 
 onUnmounted(() => {
   cancelAnimationFrame(animationFrameId);
+  if (isVideo.value && diffuseSource) {
+    diffuseSource.pause();
+    diffuseSource.src = "";
+    diffuseSource.load();
+  }
 });
 
 function initGL() {
@@ -140,25 +167,58 @@ function initGL() {
   uNormalMap = gl.getUniformLocation(program, "u_normalMap");
 }
 
-function loadTexture(gl, url, isDiffuse) {
+function loadSource(gl, url, isDiffuse) {
   return new Promise(resolve => {
+    const tex = gl.createTexture();
+    gl.bindTexture(gl.TEXTURE_2D, tex);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
+
+    gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, 1, 1, 0, gl.RGBA, gl.UNSIGNED_BYTE, new Uint8Array([0, 0, 0, 0]));
+
+    if (isDiffuse) {
+      const el = mediaRef.value;
+      if (!el) {
+        resolve(tex);
+        return;
+      }
+
+      diffuseSource = el;
+
+      const onReady = () => {
+        if (isVideo.value) {
+          imgAspect = el.videoHeight / el.videoWidth;
+          el.play().catch(() => { });
+        } else {
+          imgAspect = el.naturalHeight / el.naturalWidth;
+          gl.bindTexture(gl.TEXTURE_2D, tex);
+          gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, el);
+        }
+        resize();
+        resolve(tex);
+      };
+
+      if (isVideo.value) {
+        if (el.readyState >= 2) onReady();
+        else el.addEventListener('loadedmetadata', onReady);
+      } else {
+        if (el.complete && el.naturalHeight !== 0) onReady();
+        else el.addEventListener('load', onReady);
+      }
+      return;
+    }
+
+    // load normal map
     const img = new Image();
     img.crossOrigin = "anonymous";
     img.onload = () => {
-      if (isDiffuse) {
-        imgAspect = img.height / img.width;
-        resize();
-      }
-
-      const tex = gl.createTexture();
       gl.bindTexture(gl.TEXTURE_2D, tex);
-      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
-      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
-      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
-      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
       gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, img);
       resolve(tex);
     };
+    img.onerror = () => resolve(tex);
     img.src = url;
   });
 }
@@ -174,9 +234,6 @@ function resize() {
   const dpr = window.devicePixelRatio || 1;
   canvas.width = displayWidth * dpr;
   canvas.height = displayHeight * dpr;
-
-  canvas.style.width = displayWidth + 'px';
-  canvas.style.height = displayHeight + 'px';
 
   gl.viewport(0, 0, canvas.width, canvas.height);
   gl.uniform2f(uResolution, canvas.width, canvas.height);
@@ -206,6 +263,16 @@ function tick() {
 function render() {
   if (!gl || !program) return;
 
+  // clean clear
+  gl.clearColor(0, 0, 0, 0);
+  gl.clear(gl.COLOR_BUFFER_BIT);
+
+  if (isVideo.value && diffuseSource && diffuseSource.readyState >= 2) {
+    gl.activeTexture(gl.TEXTURE0);
+    gl.bindTexture(gl.TEXTURE_2D, diffuseTexture);
+    gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, diffuseSource);
+  }
+
   gl.uniform2f(uMouse, mouseX, mouseY);
   gl.uniform1f(uStrength, strength);
 
@@ -232,7 +299,11 @@ function createShader(gl, type, source) {
 
 <template>
   <div ref="container" class="scene" @mousemove="onMoveMouse" @mouseenter="onEnter" @mouseleave="onLeave">
-    <canvas ref="canvas"></canvas>
+    <video v-if="isVideo" ref="media" :src="diffuseImg" class="media-overlay" :class="{ 'is-hidden': isReady }" loop
+      muted autoplay playsinline crossorigin="anonymous"></video>
+    <img v-else ref="media" :src="diffuseImg" class="media-overlay" :class="{ 'is-hidden': isReady }"
+      crossorigin="anonymous" alt="" />
+    <canvas ref="canvas" class="canvas-layer" :class="{ 'is-visible': isReady }"></canvas>
   </div>
 </template>
 
@@ -247,5 +318,32 @@ function createShader(gl, type, source) {
 
 canvas {
   display: block;
+}
+
+.media-overlay {
+  display: block;
+  width: 100%;
+  height: auto;
+  transition: opacity 0.4s ease;
+  will-change: opacity;
+}
+
+.media-overlay.is-hidden {
+  opacity: 0;
+}
+
+.canvas-layer {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  opacity: 0;
+  transition: opacity 0.4s ease;
+  pointer-events: none;
+}
+
+.canvas-layer.is-visible {
+  opacity: 1;
 }
 </style>

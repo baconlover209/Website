@@ -16,6 +16,7 @@ const navLinks = [
   { name: "Projects", path: "/projects" },
   { name: "Gallery", path: "/gallery" },
   { name: "Comms", path: "/commissions" },
+  { name: "Queue", path: "/queue" },
 ];
 
 const route = useRoute();
@@ -40,6 +41,25 @@ const toggleSlideshow = () => {
 
 onMounted(async () => {
   window.addEventListener("mousemove", updateGlobalMouse);
+
+  const query = route.query;
+  if (query.key && query.id) {
+    const id = query.id;
+    const key = query.key;
+
+    const map = JSON.parse(localStorage.getItem('commission_key_map') || '{}');
+    map[id] = key;
+    localStorage.setItem('commission_key_map', JSON.stringify(map));
+
+    const list = new Set((localStorage.getItem('commission_keys') || '').split(',').filter(Boolean));
+    list.add(key);
+    localStorage.setItem('commission_keys', Array.from(list).join(','));
+
+  } else if (query.key) {
+    const list = new Set((localStorage.getItem('commission_keys') || '').split(',').filter(Boolean));
+    list.add(query.key);
+    localStorage.setItem('commission_keys', Array.from(list).join(','));
+  }
 
   try {
     const { pieces, tags } = await fetchArt();

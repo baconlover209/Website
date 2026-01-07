@@ -2,6 +2,8 @@ import { createRouter, createWebHistory } from 'vue-router'
 import Home from '../views/Home.vue'
 import Commissions from '../views/Commissions.vue'
 import Gallery from '../views/Gallery.vue'
+import Projects from '../views/Projects.vue'
+import Queue from '../views/Queue.vue'
 
 const routes = [
     {
@@ -18,6 +20,16 @@ const routes = [
         path: '/gallery',
         name: 'Gallery',
         component: Gallery
+    },
+    {
+        path: '/projects',
+        name: 'Projects',
+        component: Projects
+    },
+    {
+        path: '/queue',
+        name: 'Queue',
+        component: Queue
     },
 ]
 

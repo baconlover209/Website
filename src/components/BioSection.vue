@@ -1,6 +1,8 @@
 <script setup>
-import { ref } from "vue";
+import { ref, onMounted } from "vue";
 import PostModal from "./modals/PostModal.vue";
+import { fetchPosts, likePost } from "@/utils/api";
+import { getRelativeTime } from "../utils/time";
 
 const navLinks = ["Twitter", "Bluesky", "Kofi", "discord"];
 const navLinkUrls = {
@@ -10,39 +12,16 @@ const navLinkUrls = {
   discord: "https://discord.gg/tjDhxMrF",
 };
 
-const posts = [
-  {
-    id: 1,
-    date: "1767344428",
-    mood: "MOOD",
-    text: "uuhhh idk",
-    likes: 1,
-    comments: [],
-  },
-  {
-    id: 2,
-    date: "1767179628",
-    mood: "WIP",
-    moodColor: "#64748b",
-    moodBg: "#f1f5f9",
-    text: "working on that new commission, will post soon...",
-    likes: 12,
-    comments: [
-      {
-        user: "person",
-        text: "uhhh",
-      },
-      {
-        user: "person2",
-        text: "life is roblos",
-      },
-    ],
-  },
-];
-
+const posts = ref([]);
 const selectedPost = ref(null);
 
-import { getRelativeTime } from "../utils/time";
+onMounted(async () => {
+  try {
+    posts.value = await fetchPosts();
+  } catch (e) {
+    console.error(e);
+  }
+});
 
 const openPost = (post) => {
   selectedPost.value = post;
@@ -52,17 +31,22 @@ const openPost = (post) => {
 const closePost = () => {
   selectedPost.value = null;
 };
+
+async function handleLike(e, post) {
+  e.stopPropagation();
+  try {
+    const updated = await likePost(post.id);
+    post.likes = updated.likes;
+  } catch (e) {
+    console.error(e);
+  }
+}
 </script>
 
 <template>
   <div class="bio-container">
     <nav class="links-nav">
-      <a
-        v-for="link in navLinks"
-        :key="link"
-        :href="navLinkUrls[link]"
-        class="nav-link"
-      >
+      <a v-for="link in navLinks" :key="link" :href="navLinkUrls[link]" class="nav-link">
         {{ link }}
       </a>
     </nav>
@@ -82,22 +66,14 @@ const closePost = () => {
         <div class="blog-line"></div>
       </div>
 
-      <div
-        v-for="post in posts"
-        :key="post.id"
-        class="blog-entry"
-        @click="openPost(post)"
-        :style="{ marginTop: post.id > 1 ? '1rem' : '0' }"
-      >
+      <div v-for="post in posts" :key="post.id" class="blog-entry" @click="openPost(post)"
+        :style="{ marginTop: post.id > 1 ? '1rem' : '0' }">
         <div class="entry-meta">
           <span class="entry-date">{{ getRelativeTime(post.date) }}</span>
-          <div
-            class="entry-badge"
-            :style="{
-              background: post.moodBg || '#e0f2fe',
-              color: post.moodColor || '#0284c7',
-            }"
-          >
+          <div class="entry-badge" :style="{
+            background: post.moodBg || '#e0f2fe',
+            color: post.moodColor || '#0284c7',
+          }">
             {{ post.mood }}
           </div>
         </div>
@@ -105,7 +81,7 @@ const closePost = () => {
           {{ post.text }}
         </p>
         <div class="entry-actions">
-          <div class="action-btn">
+          <div class="action-btn" @click="(e) => handleLike(e, post)">
             <div class="i-mdi-heart-outline"></div>
             <span>{{ post.likes }}</span>
           </div>
