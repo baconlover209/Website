@@ -489,9 +489,8 @@ function handleLogoMouse(e) {
 
 .title-huge {
   font-size: 5rem;
-  <<<<<<< HEAD font-weight: 900;
-  =======font-weight: 1000;
-  >>>>>>>8305a8badcbe782ded83e9be21b22d91ad5ce9e9 text-transform: uppercase;
+  font-weight: 900;
+  text-transform: uppercase;
   line-height: 0.8;
   margin-bottom: 2.5rem;
 }
