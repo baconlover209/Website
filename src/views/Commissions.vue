@@ -24,8 +24,15 @@ const pricing = {
 
 const paintingStack = ref([]);
 
+import { preloadImages } from "@/utils/preloader";
+
 onMounted(async () => {
   try {
+    // preload static images
+    const styleImages = pricing.styles.map(s => s.art);
+    const bgImages = backgrounds.map(b => b.img);
+    preloadImages([...styleImages, ...bgImages]);
+
     const data = await fetchArt("comm_flipbook");
     paintingStack.value = data.pieces.map((item) => item.img);
   } catch (error) {
@@ -76,7 +83,7 @@ function handleLogoMouse(e) {
               borderColor: currentStyleData.color,
               '--tint': currentStyleData.color,
             }">
-              <img :src="currentStyleData.art" class="art-image" :alt="selectedStyle" />
+              <img :src="currentStyleData.art" class="art-image" :alt="selectedStyle" decoding="sync" loading="eager" />
               <span class="label-bottom">{{ selectedStyle }} Style</span>
             </div>
           </transition>
