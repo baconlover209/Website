@@ -1,11 +1,11 @@
-import { createRouter, createWebHistory } from 'vue-router'
+import { createRouter, createWebHistory, createMemoryHistory } from 'vue-router'
 import Home from '../views/Home.vue'
 import Commissions from '../views/Commissions.vue'
 import Gallery from '../views/Gallery.vue'
 import Projects from '../views/Projects.vue'
 import Queue from '../views/Queue.vue'
 
-const routes = [
+export const routes = [
     {
         path: '/',
         name: 'Home',
@@ -34,7 +34,7 @@ const routes = [
 ]
 
 const router = createRouter({
-    history: createWebHistory(),
+    history: import.meta.env.SSR ? createMemoryHistory() : createWebHistory(),
     routes
 })
 

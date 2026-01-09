@@ -69,9 +69,7 @@ onMounted(async () => {
     if (slideshowTag) {
       slideshowIds.value = slideshowTag.slideshow;
     }
-
-    const pieceUrls = pieces.map((p) => p.img);
-    const assetsToPreload = [...pieceUrls, avatarUrl, charUrl];
+    const assetsToPreload = [avatarUrl, charUrl];
 
     preloadImages(assetsToPreload);
   } catch (err) {
@@ -290,27 +288,27 @@ body {
 
 .left-column {
   flex: 0 0 600px;
-  display: grid;
-  grid-template-rows: auto 1fr;
+  display: flex;
+  flex-direction: column;
   border-right: 4px solid var(--sidebar-border);
   background: var(--bg-sidebar);
   z-index: 10;
   position: relative;
-  transition: grid-template-rows 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: all 0.8s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .left-column.expanded-halftone {
-  grid-template-rows: 1fr 0fr;
+  /* No grid template changes needed for flex */
 }
 
 .sidebar-header {
-  grid-row: 1;
+  flex: 0 0 auto;
   padding: 2rem;
   border-bottom: 4px solid var(--sidebar-border);
   position: relative;
   overflow: hidden;
   transition: all 0.8s cubic-bezier(0.4, 0, 0.2, 1);
-  min-height: 50px;
+  min-height: 220px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -318,6 +316,7 @@ body {
 }
 
 .expanded-halftone .sidebar-header {
+  flex: 1 1 auto;
   border-bottom-color: transparent;
   padding: 0;
 }
@@ -334,13 +333,16 @@ body {
 }
 
 .sidebar-body {
-  grid-row: 2;
+  flex: 1 1 auto;
   overflow: hidden;
   padding: 2rem;
   transition: all 0.8s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .expanded-halftone .sidebar-body {
+  flex: 0 0 0;
+  height: 0;
+  min-height: 0;
   padding-top: 0;
   padding-bottom: 0;
   opacity: 0;

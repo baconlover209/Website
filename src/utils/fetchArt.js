@@ -1,12 +1,18 @@
+let cachedArtPromise = null;
+
 export async function fetchArt(tag) {
     try {
-        // fetch the JSON data
-        const response = await fetch('/art.json');
-        if (!response.ok) {
-            throw new Error(`Failed to fetch art.json. HTTP status: ${response.status}`);
+        // fetch the JSON data if not cached
+        if (!cachedArtPromise) {
+            cachedArtPromise = fetch('/art.json').then(async (response) => {
+                if (!response.ok) {
+                    throw new Error(`Failed to fetch art.json. HTTP status: ${response.status}`);
+                }
+                return response.json();
+            });
         }
 
-        const data = await response.json();
+        const data = await cachedArtPromise;
         const pieces = data.data.pieces;
         const tags = data.data.tags;
 

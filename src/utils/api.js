@@ -1,12 +1,17 @@
 import { ref } from 'vue';
 
 const API_BASE = 'https://dart.blueberry.coffee';
-export const isUserAdmin = ref(!!localStorage.getItem('auth_key'));
+export const isUserAdmin = ref(false);
+if (typeof window !== 'undefined') {
+    isUserAdmin.value = !!localStorage.getItem('auth_key');
+}
 
 const getHeaders = () => {
     const headers = {
         'Content-Type': 'application/json',
     };
+    if (typeof window === 'undefined') return headers;
+
     const key = localStorage.getItem('auth_key');
     if (key) {
         headers['Authorization'] = `Bearer ${key}`;
@@ -42,7 +47,7 @@ const getHeaders = () => {
 export async function addCommissionComment(id, text, username = 'Me') {
     const headers = getHeaders();
 
-    if (!headers['Authorization']) {
+    if (!headers['Authorization'] && typeof window !== 'undefined') {
         const storedMap = JSON.parse(localStorage.getItem('commission_key_map') || '{}');
         const specificKey = storedMap[id];
         if (specificKey) {

@@ -30,4 +30,14 @@ export default defineConfig({
       '@': fileURLToPath(new URL('./src', import.meta.url))
     },
   },
+
+  ssgOptions: {
+    crittersOptions: {
+      package: 'beasties',
+      pruneSource: true,
+      inlineFonts: true,
+      preload: 'media',
+      reduceInlineStyles: false
+    }
+  }
 })

@@ -51,14 +51,16 @@ const formatDate = (date) => {
 <template>
   <div class="profile-container">
     <div class="identity-wrapper" :class="{ 'slideshow-active': isSlideshowActive }">
-      <transition name="fade" mode="out-in">
-        <div v-if="!isSlideshowActive" key="profile" class="profile-content">
+      <transition name="fade">
+        <div v-show="!isSlideshowActive" class="profile-content">
           <div ref="card" class="avatar-frame" @mousemove="handleMouseMove">
             <normal normal-img="normal.png" diffuse-img="pfp.webm" />
           </div>
           <h1 class="name-title">DART</h1>
         </div>
-        <div v-else key="datetime" class="datetime-content">
+      </transition>
+      <transition name="fade">
+        <div v-show="isSlideshowActive" class="datetime-content">
           <div class="time-display">{{ formatTime(currentTime) }}</div>
           <div class="date-display">{{ formatDate(currentTime) }}</div>
         </div>
@@ -80,11 +82,8 @@ const formatDate = (date) => {
 }
 
 .identity-wrapper {
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-  justify-content: center;
-  gap: 2rem;
+  display: grid;
+  place-items: center;
   min-height: 150px;
   transition: all 0.6s ease;
 }
@@ -94,7 +93,9 @@ const formatDate = (date) => {
   flex: 1;
 }
 
-.profile-content {
+.profile-content,
+.datetime-content {
+  grid-area: 1 / 1;
   display: flex;
   flex-direction: row;
   flex-wrap: wrap;
@@ -105,13 +106,9 @@ const formatDate = (date) => {
 }
 
 .datetime-content {
-  display: flex;
   flex-direction: column;
-  align-items: center;
-  justify-content: center;
   color: white;
   text-align: center;
-  width: 100%;
 }
 
 .time-display {
@@ -146,6 +143,8 @@ const formatDate = (date) => {
 .avatar-frame {
   width: 150px;
   height: 150px;
+  min-width: 150px;
+  min-height: 150px;
   border-radius: 50%;
   border: 6px solid var(--bg-card);
   background: var(--bg-card);
@@ -155,6 +154,7 @@ const formatDate = (date) => {
   transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
   z-index: 10;
   aspect-ratio: 1;
+  flex-shrink: 0;
 }
 
 .avatar-frame:hover {
