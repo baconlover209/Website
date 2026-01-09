@@ -140,11 +140,11 @@ function handleLogoMouse(e) {
       </div>
 
       <div class="animation-card hover-subtle">
-        <h3 class="anim-title">Animation</h3>
+        <h3 class="anim-title">Info</h3>
         <div class="anim-lines">
-          <div class="line">✦ uhh blahh</div>
-          <div class="line">✦ 24 FPS or smth</div>
-          <div class="line">✦ yuh</div>
+          <div class="line">✦ I can do simple animation frame/frame</div>
+          <div class="line">✦ Very complex designs may cost more</div>
+          <div class="line">✦ Detailed props may also be additional charge</div>
         </div>
       </div>
     </div>
@@ -155,10 +155,11 @@ function handleLogoMouse(e) {
       <div class="painting-info">
         <h2 class="title-huge text-pop">Painting</h2>
         <div class="painting-details">
-          <div class="detail-item">✦ Fully Rendered Illustrations</div>
-          <div class="detail-item">✦ Atmospheric Lighting & FX</div>
-          <div class="detail-item">✦ High Resolution PNG</div>
-          <div class="painting-price">STARTING AT $150</div>
+          <div class="detail-item">✦ Physical Paintings/Drawings</div>
+          <div class="detail-item">✦ Priced on Canvas Size / Painting Detail</div>
+          <div class="detail-item">✦ Shipping + High Resolution Photo</div>
+          <div class="painting-price">STARTING AT ~$100</div>
+          <div class="detail-item opacity-40">*for letter sized standard painting</div>
         </div>
         <div class="filler-lines">
           <div class="f-line short"></div>
@@ -465,7 +466,7 @@ function handleLogoMouse(e) {
 }
 
 .anim-lines {
-  font-weight: 800;
+  font-weight: 500;
   font-size: 1.2rem;
   color: var(--text-secondary);
   display: flex;
@@ -488,7 +489,7 @@ function handleLogoMouse(e) {
 }
 
 .title-huge {
-  font-size: 7rem;
+  font-size: 5rem;
   font-weight: 1000;
   text-transform: uppercase;
   line-height: 0.8;

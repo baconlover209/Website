@@ -26,7 +26,7 @@ defineEmits(["close"]);
                                 </span>
                             </div>
                             <span class="font-display font-900 text-2xl tracking-wider">
-                                POST VIEW
+                                UPDATE
                             </span>
                         </div>
                         <button class="neo-close-btn" @click="$emit('close')">
