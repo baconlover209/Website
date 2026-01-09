@@ -155,11 +155,10 @@ function handleLogoMouse(e) {
       <div class="painting-info">
         <h2 class="title-huge text-pop">Painting</h2>
         <div class="painting-details">
-          <div class="detail-item">✦ Physical Paintings/Drawings</div>
-          <div class="detail-item">✦ Priced on Canvas Size / Painting Detail</div>
-          <div class="detail-item">✦ Shipping + High Resolution Photo</div>
-          <div class="painting-price">STARTING AT ~$100</div>
-          <div class="detail-item">*for letter sized standard painting</div>
+          <div class="detail-item">✦ Fully Rendered Illustrations</div>
+          <div class="detail-item">✦ Atmospheric Lighting & FX</div>
+          <div class="detail-item">✦ High Resolution PNG</div>
+          <div class="painting-price">STARTING AT $150</div>
         </div>
         <div class="filler-lines">
           <div class="f-line short"></div>
@@ -490,8 +489,9 @@ function handleLogoMouse(e) {
 
 .title-huge {
   font-size: 5rem;
-  font-weight: 900;
-  text-transform: uppercase;
+  <<<<<<< HEAD font-weight: 900;
+  =======font-weight: 1000;
+  >>>>>>>8305a8badcbe782ded83e9be21b22d91ad5ce9e9 text-transform: uppercase;
   line-height: 0.8;
   margin-bottom: 2.5rem;
 }
