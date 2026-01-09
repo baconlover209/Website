@@ -41,6 +41,18 @@ async function handleLike(e, post) {
     console.error(e);
   }
 }
+
+function getContrastColor(hexColor) {
+  if (!hexColor) return '#ffffff';
+  const hex = hexColor.replace('#', '');
+  const r = parseInt(hex.substr(0, 2), 16);
+  const g = parseInt(hex.substr(2, 2), 16);
+  const b = parseInt(hex.substr(4, 2), 16);
+
+  const yiq = ((r * 299) + (g * 587) + (b * 114)) / 1000;
+
+  return (yiq >= 128) ? '#000000' : '#ffffff';
+}
 </script>
 
 <template>
@@ -71,8 +83,9 @@ async function handleLike(e, post) {
         <div class="entry-meta">
           <span class="entry-date">{{ getRelativeTime(post.date) }}</span>
           <div class="entry-badge" :style="{
-            background: post.moodBg || '#e0f2fe',
-            color: post.moodColor || '#0284c7',
+            background: post.moodColor || '#0369a1',
+            color: getContrastColor(post.moodColor || '#0369a1'),
+            border: 'none'
           }">
             {{ post.mood }}
           </div>
@@ -163,7 +176,7 @@ async function handleLike(e, post) {
   font-family: "Outfit", sans-serif;
   font-weight: 700;
   font-size: 1rem;
-  color: #94a3b8;
+  color: var(--text-secondary);
   letter-spacing: 0.1em;
 }
 
@@ -197,13 +210,16 @@ async function handleLike(e, post) {
   font-family: "Outfit", sans-serif;
   font-size: 0.8rem;
   font-weight: 700;
-  color: #94a3b8;
+  color: var(--text-secondary);
 }
 
 .entry-badge {
-  padding: 2px 8px;
-  border-radius: 4px;
+  padding: 4px 10px;
+  border-radius: 6px;
   letter-spacing: 0.05em;
+  font-weight: 700;
+  text-transform: uppercase;
+  font-size: 0.75rem;
 }
 
 .entry-text {
@@ -225,7 +241,7 @@ async function handleLike(e, post) {
   display: flex;
   align-items: center;
   gap: 0.5rem;
-  color: #64748b;
+  color: var(--text-secondary);
   font-size: 0.9rem;
   font-weight: 600;
   transition: color 0.2s;

@@ -1,5 +1,4 @@
 <script setup>
-import avatarUrl from "../assets/pfp.webp";
 import { ref, onMounted, onUnmounted } from "vue";
 import normal from "./normal.vue";
 

@@ -26,7 +26,7 @@ defineEmits(["close"]);
                                 </span>
                             </div>
                             <span class="font-display font-900 text-2xl tracking-wider">
-                                POST VIEW
+                                UPDATE
                             </span>
                         </div>
                         <button class="neo-close-btn" @click="$emit('close')">
@@ -38,8 +38,8 @@ defineEmits(["close"]);
 
                     <div class="p-8 overflow-y-auto flex-1">
                         <div class="flex gap-2 font-display text-sm font-bold mb-2">
-                            <span class="text-[var(--text-muted)]"> {{ getRelativeTime(post.date)}} </span>
-                            <span class="text-[var(--text-muted)]">::</span>
+                            <span class="text-[var(--text-secondary)]"> {{ getRelativeTime(post.date) }} </span>
+                            <span class="text-[var(--text-secondary)]">::</span>
                             <span class="text-[var(--accent)] uppercase"> {{ post.mood }}</span>
                         </div>
 
@@ -47,7 +47,8 @@ defineEmits(["close"]);
                             {{ post.text }}
                         </div>
 
-                        <div class="bg-[var(--bg-card-alt)] rounded-xl p-6 border-2 border-[var(--text-dim)] border-solid shadow-sm">
+                        <div
+                            class="bg-[var(--bg-card-alt)] rounded-xl p-6 border-2 border-[var(--text-dim)] border-solid shadow-sm">
                             <div class="font-display font-800 font-xs text-[var(--text-muted)] mb-4 tracking-widest">
                                 COMMENTS_FEED
                             </div>
@@ -58,7 +59,8 @@ defineEmits(["close"]);
                                         class="w-8 h-8 bg-[var(--text-muted)] rounded-full border-2 border-[var(--border-color)] shadow-sm shrink-0 opacity-40">
                                     </div>
 
-                                    <div class="bg-[var(--bg-card)] p-3 px-4 rounded-tr-xl rounded-b-xl shadow-sm border border-[var(--text-dim)] border-opacity-20">
+                                    <div
+                                        class="bg-[var(--bg-card)] p-3 px-4 rounded-tr-xl rounded-b-xl shadow-sm border border-[var(--text-dim)] border-opacity-20">
                                         <div class="text-xs font-800 text-[var(--text-muted)] mb-1">
                                             {{ comment.user }}
                                         </div>
@@ -68,7 +70,7 @@ defineEmits(["close"]);
                                     </div>
                                 </div>
                             </div>
-                            <div v-else class="text-slate-400 font-mono text-sm">
+                            <div v-else class="text-[var(--text-secondary)] font-mono text-sm">
                                 // No comments yet...
                             </div>
                         </div>
@@ -125,6 +127,7 @@ defineEmits(["close"]);
         transform: scale(0.9) translateY(20px);
         opacity: 0;
     }
+
     100% {
         transform: scale(1) translateY(0);
     }

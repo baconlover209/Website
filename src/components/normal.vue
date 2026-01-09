@@ -98,20 +98,16 @@ onMounted(async () => {
 
   initGL();
 
-  // Load textures
+  normalTexture = createFlattenedNormalTexture(gl);
+
   try {
-    const [dTex, nTex] = await Promise.all([
-      loadSource(gl, props.diffuseImg, true),
-      loadSource(gl, props.normalImg, false)
-    ]);
-    diffuseTexture = dTex;
-    normalTexture = nTex;
+    diffuseTexture = await loadSource(gl, props.diffuseImg, true);
 
     requestAnimationFrame(() => {
       isReady.value = true;
     });
   } catch (e) {
-    console.error("Failed to load textures", e);
+    console.error("Failed to load texture", e);
   }
 
   if (diffuseTexture) {
@@ -120,6 +116,7 @@ onMounted(async () => {
     gl.uniform1i(uDiffuseMap, 0);
   }
 
+  // Bind default normal map initially
   if (normalTexture) {
     gl.activeTexture(gl.TEXTURE1);
     gl.bindTexture(gl.TEXTURE_2D, normalTexture);
@@ -132,6 +129,28 @@ onMounted(async () => {
   // start loop
   tick();
 });
+
+function createFlattenedNormalTexture(gl) {
+  const tex = gl.createTexture();
+  gl.bindTexture(gl.TEXTURE_2D, tex);
+  gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, 1, 1, 0, gl.RGBA, gl.UNSIGNED_BYTE, new Uint8Array([128, 128, 255, 255]));
+  return tex;
+}
+
+let isNormalLoading = false;
+async function loadNormalIfNeeded() {
+  if (isNormalLoading) return;
+  isNormalLoading = true;
+  try {
+    const realNormal = await loadSource(gl, props.normalImg, false);
+    normalTexture = realNormal;
+    gl.activeTexture(gl.TEXTURE1);
+    gl.bindTexture(gl.TEXTURE_2D, normalTexture);
+    gl.uniform1i(uNormalMap, 1);
+  } catch (e) {
+    console.error("Failed to load real normal map", e);
+  }
+}
 
 onUnmounted(() => {
   cancelAnimationFrame(animationFrameId);
@@ -247,6 +266,7 @@ function onMoveMouse(e) {
 }
 
 function onEnter() {
+  loadNormalIfNeeded();
   targetStrength = 1.0;
 }
 function onLeave() {
@@ -300,9 +320,9 @@ function createShader(gl, type, source) {
 <template>
   <div ref="container" class="scene" @mousemove="onMoveMouse" @mouseenter="onEnter" @mouseleave="onLeave">
     <video v-if="isVideo" ref="media" :src="diffuseImg" class="media-overlay" :class="{ 'is-hidden': isReady }" loop
-      muted autoplay playsinline crossorigin="anonymous"></video>
+      muted autoplay playsinline crossorigin="anonymous" aria-hidden="true" role="presentation"></video>
     <img v-else ref="media" :src="diffuseImg" class="media-overlay" :class="{ 'is-hidden': isReady }"
-      crossorigin="anonymous" alt="" />
+      crossorigin="anonymous" alt="" aria-hidden="true" role="presentation" />
     <canvas ref="canvas" class="canvas-layer" :class="{ 'is-visible': isReady }"></canvas>
   </div>
 </template>

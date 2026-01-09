@@ -32,16 +32,16 @@ const selectedImage = ref(null);
   <div class="h-100%">
     <div class="gallery-layout">
       <div class="feature-box">
-        <img :src="artUrl" class="feature-img" @click="openImage({ img: featureFullArtRef })" fetchpriority="high"
-          loading="eager" />
+        <img :src="artUrl" class="feature-img" alt="Featured Character Art"
+          @click="openImage({ img: featureFullArtRef })" fetchpriority="high" loading="eager" />
         <div class="feature-badge">FEATURED</div>
       </div>
 
       <div class="thumbnails-row overflow-x-scroll hide-scrollbar">
-        <div v-for="item in galleryItems" :key="item.id" class="thumb-square-link">
+        <div v-for="(item, index) in galleryItems" :key="item.id" class="thumb-square-link">
           <div class="thumb-inner flex items-center justify-center">
-            <img :src="item.img" class="thumb-img" :alt="item.name" @click="openImage(item)" fetchpriority="high"
-              loading="eager" />
+            <img :src="item.img" class="thumb-img" :alt="item.name" @click="openImage(item)"
+              :fetchpriority="index < 4 ? 'high' : 'auto'" :loading="index < 4 ? 'eager' : 'lazy'" />
           </div>
         </div>
       </div>

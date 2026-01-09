@@ -130,7 +130,7 @@ function handleLogoMouse(e) {
         </div>
       </div>
     </div>
-    <h class="anim-title">Backgrounds</h>
+    <h2 class="anim-title">Backgrounds</h2>
     <div class="middle-grid">
       <div v-for="bg in backgrounds" :key="bg.name" class="grid-item">
         <div class="item-square hover-subtle">
@@ -140,11 +140,11 @@ function handleLogoMouse(e) {
       </div>
 
       <div class="animation-card hover-subtle">
-        <h3 class="anim-title">Animation</h3>
+        <h3 class="anim-title">Info</h3>
         <div class="anim-lines">
-          <div class="line">✦ uhh blahh</div>
-          <div class="line">✦ 24 FPS or smth</div>
-          <div class="line">✦ yuh</div>
+          <div class="line">✦ I can do simple animation frame/frame</div>
+          <div class="line">✦ Very complex designs may cost more</div>
+          <div class="line">✦ Detailed props may also be additional charge</div>
         </div>
       </div>
     </div>
@@ -155,10 +155,11 @@ function handleLogoMouse(e) {
       <div class="painting-info">
         <h2 class="title-huge text-pop">Painting</h2>
         <div class="painting-details">
-          <div class="detail-item">✦ Fully Rendered Illustrations</div>
-          <div class="detail-item">✦ Atmospheric Lighting & FX</div>
-          <div class="detail-item">✦ High Resolution PNG</div>
-          <div class="painting-price">STARTING AT $150</div>
+          <div class="detail-item">✦ Physical Paintings/Drawings</div>
+          <div class="detail-item">✦ Priced on Canvas Size / Painting Detail</div>
+          <div class="detail-item">✦ Shipping + High Resolution Photo</div>
+          <div class="painting-price">STARTING AT ~$100</div>
+          <div class="detail-item">*for letter sized standard painting</div>
         </div>
         <div class="filler-lines">
           <div class="f-line short"></div>
@@ -175,7 +176,7 @@ function handleLogoMouse(e) {
                 }deg) translateX(${(idx - (paintingStack.length - 1)) * 5}px)`,
               pointerEvents: idx === paintingStack.length - 1 ? 'auto' : 'none',
             }">
-            <img :src="img" class="spread-img" />
+            <img :src="img" class="spread-img" alt="Commission example" />
           </div>
         </transition-group>
         <div class="spread-hint">CLICK TO FLIP THROUGH</div>
@@ -243,7 +244,7 @@ function handleLogoMouse(e) {
   color: white;
   padding: 0.6rem;
   text-align: center;
-  font-weight: 1000;
+  font-weight: 900;
   text-transform: uppercase;
   font-size: 0.85rem;
   letter-spacing: 0.15em;
@@ -280,7 +281,7 @@ function handleLogoMouse(e) {
 
 .title-main {
   font-size: 4rem;
-  font-weight: 1000;
+  font-weight: 900;
   text-transform: uppercase;
   line-height: 0.8;
   letter-spacing: -0.04em;
@@ -309,7 +310,7 @@ function handleLogoMouse(e) {
 .style-btn {
   position: relative;
   padding: 0.8rem;
-  font-weight: 1000;
+  font-weight: 900;
   text-transform: uppercase;
   border: 3px solid var(--border-color);
   background: var(--bg-card);
@@ -372,7 +373,7 @@ function handleLogoMouse(e) {
   grid-template-columns: 100px 50px 1fr;
   align-items: center;
   font-size: 2rem;
-  font-weight: 1000;
+  font-weight: 900;
   text-transform: uppercase;
 }
 
@@ -400,7 +401,7 @@ function handleLogoMouse(e) {
   background: var(--bg-card);
   border: 3px solid var(--border-color);
   padding: 0.6rem 1.2rem;
-  font-weight: 1000;
+  font-weight: 900;
   text-transform: uppercase;
   font-size: 0.85rem;
   box-shadow: 6px 6px 0px 0px var(--border-color);
@@ -434,7 +435,7 @@ function handleLogoMouse(e) {
 }
 
 .item-caption {
-  font-weight: 1000;
+  font-weight: 900;
   text-transform: uppercase;
   font-size: 1.4rem;
   color: var(--text-primary);
@@ -457,7 +458,7 @@ function handleLogoMouse(e) {
 
 .anim-title {
   font-size: clamp(1.2rem, 11cqw, 2.2rem);
-  font-weight: 1000;
+  font-weight: 900;
   text-transform: uppercase;
   margin-bottom: 1.25rem;
   line-height: 1;
@@ -465,7 +466,7 @@ function handleLogoMouse(e) {
 }
 
 .anim-lines {
-  font-weight: 800;
+  font-weight: 500;
   font-size: 1.2rem;
   color: var(--text-secondary);
   display: flex;
@@ -488,8 +489,8 @@ function handleLogoMouse(e) {
 }
 
 .title-huge {
-  font-size: 7rem;
-  font-weight: 1000;
+  font-size: 5rem;
+  font-weight: 900;
   text-transform: uppercase;
   line-height: 0.8;
   margin-bottom: 2.5rem;
@@ -579,7 +580,7 @@ function handleLogoMouse(e) {
 .spread-hint {
   position: absolute;
   bottom: -25px;
-  font-weight: 1000;
+  font-weight: 900;
   font-size: 0.85rem;
   letter-spacing: 0.2em;
   color: var(--text-secondary);

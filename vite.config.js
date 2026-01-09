@@ -20,7 +20,7 @@ export default defineConfig({
     minify: 'esbuild',
     rollupOptions: {
       treeshake: {
-        moduleSideEffects: false
+        moduleSideEffects: (id) => !id.includes('virtual:uno.css')
       },
     }
   },
@@ -37,7 +37,7 @@ export default defineConfig({
       pruneSource: true,
       inlineFonts: true,
       preload: 'media',
-      reduceInlineStyles: false
+      reduceInlineStyles: true,
     }
   }
 })

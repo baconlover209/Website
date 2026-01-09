@@ -3,7 +3,7 @@ import { onMounted, onUnmounted, ref, watch } from "vue";
 import { useRoute } from "vue-router";
 import { preloadImages } from "./utils/preloader";
 import { fetchArt } from "./utils/fetchArt";
-import avatarUrl from "./assets/pfp.webp";
+
 import charUrl from "./assets/character.webp";
 import ProfileSidebar from "./components/ProfileSidebar.vue";
 import BioSection from "./components/BioSection.vue";
@@ -69,7 +69,7 @@ onMounted(async () => {
     if (slideshowTag) {
       slideshowIds.value = slideshowTag.slideshow;
     }
-    const assetsToPreload = [avatarUrl, charUrl];
+    const assetsToPreload = [charUrl];
 
     preloadImages(assetsToPreload);
   } catch (err) {
@@ -295,10 +295,6 @@ body {
   z-index: 10;
   position: relative;
   transition: all 0.8s cubic-bezier(0.4, 0, 0.2, 1);
-}
-
-.left-column.expanded-halftone {
-  /* No grid template changes needed for flex */
 }
 
 .sidebar-header {
