@@ -31,7 +31,7 @@ onMounted(async () => {
         <transition-group name="gallery-item" tag="div" class="grid-wrapper">
           <div v-for="item in galleryItems" :key="item.img" class="grid-item">
             <div class="item-square hover-subtle hover:cursor-pointer">
-              <img :src="item.img" class="grid-img" :alt="item.name" @click="openImage(item)" />
+              <img :src="item.img" class="grid-img" :alt="item.name" @click="openImage(item)" loading="lazy" />
             </div>
             <div class="item-caption">
               {{ item.name }} —

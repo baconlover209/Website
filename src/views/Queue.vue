@@ -302,27 +302,30 @@ function formatPrice(p) {
                     <button class="close-archive" @click="isArchiveOpen = false">×</button>
                 </div>
 
-                <VueDraggable v-model="archivedTasks" group="tasks" :animation="150" ghost-class="ghost-card"
-                    class="archive-list" @add="onArchiveAdd">
+                <div class="archive-content-wrapper">
                     <div v-if="archivedTasks.length === 0" class="empty-archive">
                         Drag items here needed
                     </div>
-                    <div v-for="element in archivedTasks" :key="element.id" class="task-card archive-card"
-                        @click="openDetail(element)">
-                        <div class="card-header-dense">
-                            <div class="header-left-group">
-                                <h3 class="client-name">{{ element.client }}</h3>
-                                <div class="mini-badges">
-                                    <span class="mini-badge">{{ element.type }}</span>
+                    <VueDraggable v-model="archivedTasks" group="tasks" :animation="150" ghost-class="ghost-card"
+                        class="archive-list" @add="onArchiveAdd" draggable=".task-card">
+                        <div v-for="element in archivedTasks" :key="element.id" class="task-card archive-card"
+                            @click="openDetail(element)">
+                            <div class="card-header-dense">
+                                <div class="header-left-group">
+                                    <h3 class="client-name">{{ element.client }}</h3>
+                                    <div class="mini-badges">
+                                        <span class="mini-badge">{{ element.type }}</span>
+                                    </div>
+                                </div>
+                                <div class="header-right-group">
+                                    <span class="date">{{ element.date }}</span>
+                                    <button class="quick-delete-btn"
+                                        @click="(e) => quickDelete(e, element.id)">×</button>
                                 </div>
                             </div>
-                            <div class="header-right-group">
-                                <span class="date">{{ element.date }}</span>
-                                <button class="quick-delete-btn" @click="(e) => quickDelete(e, element.id)">×</button>
-                            </div>
                         </div>
-                    </div>
-                </VueDraggable>
+                    </VueDraggable>
+                </div>
             </div>
         </div>
 
@@ -651,7 +654,20 @@ function formatPrice(p) {
     opacity: 1;
 }
 
+.archive-content-wrapper {
+    flex: 1;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+
 .empty-archive {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 80%;
     height: 150px;
     display: flex;
     align-items: center;
@@ -661,7 +677,8 @@ function formatPrice(p) {
     color: var(--text-muted);
     font-weight: 800;
     opacity: 0.5;
-    padding: 2rem;
+    pointer-events: none;
+    z-index: 10;
 }
 
 .header-right-group {
