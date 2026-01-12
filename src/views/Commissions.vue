@@ -2,6 +2,7 @@
 import { ref, computed, onMounted } from "vue";
 import { fetchArt } from "@/utils/fetchArt";
 import HalftoneLayer from "@/components/HalftoneLayer.vue";
+import { hueShift } from "@/utils/hue";
 
 const lx = ref("50%");
 const ly = ref("50%");
@@ -72,6 +73,17 @@ function handleLogoMouse(e) {
   lx.value = `${x}px`;
   ly.value = `${y}px`;
 }
+
+async function handleFeaturedBadgeClick() {
+  // Increment by 20, wrap around 360
+  // ease value over .5 seconds
+  for (let i = 0; i < 20; i++) {
+    hueShift.value = hueShift.value + 1;
+    document.documentElement.style.setProperty("--hue-shift", `${hueShift.value}deg`);
+    document.documentElement.style.setProperty("--halftone-dot-hue", `calc(180deg + ${hueShift.value}deg)`);
+    await new Promise((resolve) => setTimeout(resolve, 10));
+  }
+}
 </script>
 
 <template>
@@ -93,7 +105,8 @@ function handleLogoMouse(e) {
         <div class="info-container">
           <div class="header-block">
             <div class="header-top">
-              <div ref="logoMark" class="logo-mark animated-halftone" @mousemove="handleLogoMouse">
+              <div ref="logoMark" class="logo-mark animated-halftone" @mousemove="handleLogoMouse"
+                @click="handleFeaturedBadgeClick">
                 <HalftoneLayer class="halftone-idle" mode="idle" dot-size="33.33%" />
                 <HalftoneLayer class="halftone-hover" mode="mouse" :x="lx" :y="ly" dot-size="33.33%" />
 

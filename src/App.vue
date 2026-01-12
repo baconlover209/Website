@@ -10,6 +10,7 @@ import BioSection from "./components/BioSection.vue";
 import ThemeToggle from "./components/ThemeToggle.vue";
 import SlideshowPlayer from "./components/SlideshowPlayer.vue";
 import HalftoneLayer from "./components/HalftoneLayer.vue";
+import { hueShift } from "./utils/hue";
 
 const navLinks = [
   { name: "Home", path: "/" },
@@ -85,6 +86,10 @@ watch(
   }
 );
 
+hueShift.value = 0;
+document.documentElement.style.setProperty("--hue-shift", `${hueShift.value}deg`);
+document.documentElement.style.setProperty("--halftone-dot-hue", `calc(180deg + ${hueShift.value}deg)`);
+
 onUnmounted(() => {
   window.removeEventListener("mousemove", updateGlobalMouse);
 });
@@ -143,51 +148,160 @@ onUnmounted(() => {
 
 <style>
 :root {
+
+  --hue-shift: 0deg;
+
+
+  /* #06b6d4 = hsl(188, 91%, 43%) */
+
+  --accent-hue: calc(188deg + var(--hue-shift));
+
+  --accent-sat: 91%;
+
+  --accent-light: 43%;
+
+  --accent: hsl(var(--accent-hue) var(--accent-sat) var(--accent-light) / 1);
+
+
+  /* #00b5ec = hsl(196, 100%, 46%) */
+
+  --halftone-bg-hue: calc(196deg + var(--hue-shift));
+
+  --halftone-bg-sat: 100%;
+
+  --halftone-bg-light: 46%;
+
+  --halftone-bg: hsl(var(--halftone-bg-hue) var(--halftone-bg-sat) var(--halftone-bg-light) / 1);
+
+
+  /* #0ff = hsl(180, 100%, 50%) */
+
+  --halftone-dot-hue: calc(180deg + var(--hue-shift));
+
+  --halftone-dot-sat: 100%;
+
+  --halftone-dot-light: 50%;
+
+  --halftone-dot-color: hsl(var(--halftone-dot-hue) var(--halftone-dot-sat) var(--halftone-dot-light) / 1);
+
+
+  /* Everything else unchanged */
+
   --bg-primary: #f1f5f9;
+
   --bg-sidebar: #ffffff;
+
   --bg-navbar: #000000;
+
   --bg-main: #f1f5f9;
+
   --bg-card: #ffffff;
+
   --bg-card-alt: #f8fafc;
+
   --text-primary: #000000;
+
   --text-secondary: #334155;
+
   --text-muted: #475569;
+
   --text-dim: #e2e8f0;
+
   --border-color: #000000;
+
   --nav-text: #ffffff;
+
   --nav-hover-bg: #222222;
+
   --nav-active-bg: #333333;
-  --accent: #06b6d4;
+
   --sidebar-border: #000000;
+
   --badge-bg: #000000;
+
   --badge-text: #ffffff;
-  --halftone-bg: #00b5ec;
+
   --halftone-opacity: 0.3;
-  --halftone-dot-color: #0ff;
+
 }
 
+
 .dark {
+
+  --hue-shift: 0deg;
+
+
+  /* #32cce0 = hsl(187, 70%, 54%) */
+
+  --accent-hue: calc(187deg + var(--hue-shift));
+
+  --accent-sat: 70%;
+
+  --accent-light: 54%;
+
+  --accent: hsl(var(--accent-hue) var(--accent-sat) var(--accent-light) / 1);
+
+
+  /* #00ccec = hsl(187, 100%, 46%) */
+
+  --halftone-bg-hue: calc(187deg + var(--hue-shift));
+
+  --halftone-bg-sat: 100%;
+
+  --halftone-bg-light: 46%;
+
+  --halftone-bg: hsl(var(--halftone-bg-hue) var(--halftone-bg-sat) var(--halftone-bg-light) / 1);
+
+
+  /* #0ff = hsl(180, 100%, 50%) */
+
+  --halftone-dot-hue: calc(180deg + var(--hue-shift));
+
+  --halftone-dot-sat: 100%;
+
+  --halftone-dot-light: 50%;
+
+  --halftone-dot-color: hsl(var(--halftone-dot-hue) var(--halftone-dot-sat) var(--halftone-dot-light) / 1);
+
+
+  /* Everything else unchanged */
+
   --bg-primary: #020617;
+
   --bg-sidebar: #020617;
+
   --bg-navbar: #000000;
+
   --bg-main: #020617;
+
   --bg-card: #0f172a;
+
   --bg-card-alt: #1e293b;
+
   --text-primary: #f8fafc;
+
   --text-secondary: #94a3b8;
+
   --text-muted: #64748b;
+
   --text-dim: #1e293b;
+
   --border-color: #1e293b;
+
   --nav-text: #ffffff;
+
   --nav-hover-bg: #1e293b;
+
   --nav-active-bg: #334155;
-  --accent: #32cce0;
+
   --sidebar-border: #1e293b;
+
   --badge-bg: var(--accent);
+
   --badge-text: #ffffff;
-  --halftone-bg: #00ccec;
+
   --halftone-opacity: 0.9;
-  --halftone-dot-color: #0ff;
+
 }
 
 * {

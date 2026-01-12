@@ -1,6 +1,7 @@
 <script setup>
 import { computed } from "vue";
 import NoiseCanvas from "./NoiseCanvas.vue";
+import WaveCanvas from "./WaveCanvas.vue";
 
 const props = defineProps({
   mode: {
@@ -26,7 +27,7 @@ const mouseStyle = computed(() => ({
     <!-- map (noise/gradient) -->
     <div class="halftone-content">
       <NoiseCanvas v-if="mode === 'idle'" />
-      <div v-else class="mouse-gradient"></div>
+      <WaveCanvas v-else />
       <div class="dot-grid"></div>
     </div>
 
@@ -47,7 +48,7 @@ const mouseStyle = computed(() => ({
   -webkit-mask-image: linear-gradient(to top,
       transparent var(--local-mask-stop),
       black 100%);
-  transition: opacity 0.5s ease;
+  transition: opacity .3s ease-in-out;
 }
 
 .halftone-content {

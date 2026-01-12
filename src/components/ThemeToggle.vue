@@ -17,7 +17,7 @@ const toggleTheme = () => {
 onMounted(() => {
     const savedTheme = localStorage.getItem('theme');
     const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-    
+
     if (savedTheme === 'dark' || (!savedTheme && prefersDark)) {
         isDark.value = true;
         document.documentElement.classList.add('dark');
@@ -26,15 +26,12 @@ onMounted(() => {
 </script>
 
 <template>
-    <button 
-        @click="toggleTheme" 
-        class="theme-toggle-btn"
-        :aria-label="isDark ? 'Switch to light mode' : 'Switch to dark mode'"
-    >
+    <button @click="toggleTheme" class="theme-toggle-btn"
+        :aria-label="isDark ? 'Switch to light mode' : 'Switch to dark mode'">
         <div class="icon-wrapper">
             <Transition name="icon-alt" mode="out-in">
-                <div v-if="isDark" key="moon" class="i-mdi-moon-waning-crescent text-2xl text-cyan-400"></div>
-                <div v-else key="sun" class="i-mdi-white-balance-sunny text-2xl text-orange-400"></div>
+                <div v-if="isDark" key="moon" class="i-mdi-moon-waning-crescent text-2xl color"></div>
+                <div v-else key="sun" class="i-mdi-white-balance-sunny text-2xl color"></div>
             </Transition>
         </div>
         <div class="toggle-track">
@@ -44,6 +41,10 @@ onMounted(() => {
 </template>
 
 <style scoped>
+.color {
+    color: var(--accent);
+}
+
 .theme-toggle-btn {
     background: transparent;
     border: none;
@@ -74,8 +75,8 @@ onMounted(() => {
 }
 
 .dark .toggle-track {
-    background: #06b6d4;
-    border-color: #0891b2;
+    background: var(--accent);
+    border-color: var(--accent);
 }
 
 .toggle-thumb {
@@ -87,7 +88,7 @@ onMounted(() => {
     background: white;
     border-radius: 50%;
     transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
-    box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
 }
 
 .toggle-thumb.is-dark {
@@ -97,17 +98,17 @@ onMounted(() => {
 
 .icon-alt-enter-active,
 .icon-alt-leave-active {
-  transition: all 0.25s ease;
+    transition: all 0.25s ease;
 }
 
 .icon-alt-enter-from {
-  opacity: 0;
-  transform: scale(0.5) rotate(-90deg);
+    opacity: 0;
+    transform: scale(0.5);
 }
 
 .icon-alt-leave-to {
-  opacity: 0;
-  transform: scale(0.5) rotate(90deg);
+    opacity: 0;
+    transform: scale(0.5);
 }
 
 .theme-toggle-btn:hover .toggle-track {
