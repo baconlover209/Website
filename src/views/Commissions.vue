@@ -35,6 +35,7 @@ onMounted(async () => {
 
     const data = await fetchArt("comm_flipbook");
     paintingStack.value = data.pieces.map((item) => item.img);
+    console.log(paintingStack.value);
   } catch (error) {
     console.error("Error loading gallery items:", error);
   }
@@ -155,10 +156,11 @@ function handleLogoMouse(e) {
       <div class="painting-info">
         <h2 class="title-huge text-pop">Painting</h2>
         <div class="painting-details">
-          <div class="detail-item">✦ Fully Rendered Illustrations</div>
-          <div class="detail-item">✦ Atmospheric Lighting & FX</div>
-          <div class="detail-item">✦ High Resolution PNG</div>
-          <div class="painting-price">STARTING AT $150</div>
+          <div class="detail-item">✦ Physical Paintings/Drawings</div>
+          <div class="detail-item">✦ Priced on Canvas Size / Painting Detail</div>
+          <div class="detail-item">✦ Shipping + High Resolution Photo</div>
+          <div class="painting-price">STARTING AT ~$100</div>
+          <div class="detail-item opacity-70">*for letter sized standard painting</div>
         </div>
         <div class="filler-lines">
           <div class="f-line short"></div>
@@ -171,8 +173,8 @@ function handleLogoMouse(e) {
           <div v-for="(img, idx) in paintingStack" :key="img" class="photo-wrap"
             :class="{ 'is-top': idx === paintingStack.length - 1 }" :style="{
               zIndex: idx,
-              transform: `rotate(${(idx - (paintingStack.length - 1)) * 2
-                }deg) translateX(${(idx - (paintingStack.length - 1)) * 5}px)`,
+              transform: `rotate(${(idx - (paintingStack.length - 1)) * 3
+                }deg) translateX(${(idx - (paintingStack.length - 1)) * 18}px)`,
               pointerEvents: idx === paintingStack.length - 1 ? 'auto' : 'none',
             }">
             <img :src="img" class="spread-img" alt="Commission example" />
@@ -536,8 +538,8 @@ function handleLogoMouse(e) {
 
 .photo-deck {
   position: relative;
-  height: 480px;
-  width: 420px;
+  height: 400px;
+  width: 500px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -547,12 +549,13 @@ function handleLogoMouse(e) {
 
 .photo-wrap {
   position: absolute;
-  width: 320px;
-  height: 400px;
-  border: 12px solid white;
+  width: 400px;
+  height: 340px;
+  padding: 12px 12px 60px 12px;
+  background: white;
+  box-shadow: 2px 2px 15px rgba(0, 0, 0, 0.15);
   transition: all 0.3s cubic-bezier(0.23, 1, 0.32, 1);
   overflow: hidden;
-  background: white;
   will-change: transform, z-index;
   backface-visibility: hidden;
   transform-style: preserve-3d;
@@ -735,7 +738,7 @@ function handleLogoMouse(e) {
 
   .photo-deck {
     width: 100%;
-    height: 400px;
+    height: 380px;
     transform: scale(0.9);
   }
 
@@ -774,13 +777,14 @@ function handleLogoMouse(e) {
   }
 
   .photo-deck {
-    height: 350px;
-    transform: scale(0.8);
+    height: 300px;
+    transform: scale(0.85);
   }
 
   .photo-wrap {
-    width: 240px;
-    height: 300px;
+    width: 300px;
+    height: 250px;
+    padding: 8px 8px 45px 8px;
   }
 }
 </style>

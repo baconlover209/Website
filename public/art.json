@@ -1,4 +1,5 @@
 {
+  "version": "1.0.0",
   "data": {
     "pieces": [
       {
@@ -60,6 +61,24 @@
         "date": "1673222400",
         "name": "wdwdwdwdwfgghhh",
         "img": "/art/wdwdwddwfgghhh.webp"
+      },
+      {
+        "id": "11",
+        "date": "1768020215",
+        "name": "plane",
+        "img": "/art/plane.webp"
+      },
+      {
+        "id": "12",
+        "date": "1768020217",
+        "name": "traintracks",
+        "img": "/art/traintracks.webp"
+      },
+      {
+        "id": "13",
+        "date": "1768020220",
+        "name": "mountains",
+        "img": "/art/mountains.webp"
       }
     ],
     "tags": [
@@ -87,9 +106,9 @@
       },
       {
         "comm_flipbook": [
-          1,
-          2,
-          3
+          11,
+          13,
+          12
         ]
       }
     ]
