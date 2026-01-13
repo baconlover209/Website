@@ -1,8 +1,10 @@
 <script setup>
 import { ref, onMounted } from "vue";
 import PostModal from "./modals/PostModal.vue";
-import { fetchPosts, likePost } from "@/utils/api";
+import CreatePostModal from "./modals/CreatePostModal.vue";
+import { fetchPosts, likePost, isUserAdmin } from "@/utils/api";
 import { getRelativeTime } from "../utils/time";
+import snarkdown from 'snarkdown';
 
 const navLinks = ["Twitter", "Bluesky", "Kofi", "discord"];
 const navLinkUrls = {
@@ -14,14 +16,17 @@ const navLinkUrls = {
 
 const posts = ref([]);
 const selectedPost = ref(null);
+const showCreateModal = ref(false);
 
-onMounted(async () => {
+const loadPosts = async () => {
   try {
     posts.value = await fetchPosts();
   } catch (e) {
     console.error(e);
   }
-});
+};
+
+onMounted(loadPosts);
 
 const openPost = (post) => {
   selectedPost.value = post;
@@ -37,6 +42,7 @@ async function handleLike(e, post) {
   try {
     const updated = await likePost(post.id);
     post.likes = updated.likes;
+    post.liked = updated.liked;
   } catch (e) {
     console.error(e);
   }
@@ -52,6 +58,32 @@ function getContrastColor(hexColor) {
   const yiq = ((r * 299) + (g * 587) + (b * 114)) / 1000;
 
   return (yiq >= 128) ? '#000000' : '#ffffff';
+}
+
+function parseMarkdown(text) {
+  if (!text) return '';
+  return snarkdown(text.replace(/\n/g, '\n\n'));
+}
+
+function handlePostCreated() {
+  loadPosts();
+}
+
+const postToEdit = ref(null);
+
+function handleEditPost(post) {
+  postToEdit.value = post;
+  selectedPost.value = null;
+  showCreateModal.value = true;
+}
+
+function handlePostDeleted() {
+  loadPosts();
+}
+
+function handleCreateModalClose() {
+  showCreateModal.value = false;
+  postToEdit.value = null;
 }
 </script>
 
@@ -76,12 +108,18 @@ function getContrastColor(hexColor) {
       <div class="blog-header">
         <span class="blog-title">UPDATES</span>
         <div class="blog-line"></div>
+        <button v-if="isUserAdmin" class="neo-btn-sm text-xs ml-2" @click="showCreateModal = true">
+          <span class="i-mdi-plus mr-1"></span> New
+        </button>
       </div>
 
       <div v-for="post in posts" :key="post.id" class="blog-entry" @click="openPost(post)"
         :style="{ marginTop: post.id > 1 ? '1rem' : '0' }">
         <div class="entry-meta">
-          <span class="entry-date">{{ getRelativeTime(post.date) }}</span>
+          <div class="flex items-center gap-2">
+            <span class="entry-date">{{ getRelativeTime(post.date) }}</span>
+            <span v-if="post.pinned" class="i-mdi-pin text-[var(--accent)] text-sm" title="Pinned"></span>
+          </div>
           <div class="entry-badge" :style="{
             background: post.moodColor || '#0369a1',
             color: getContrastColor(post.moodColor || '#0369a1'),
@@ -90,12 +128,12 @@ function getContrastColor(hexColor) {
             {{ post.mood }}
           </div>
         </div>
-        <p class="entry-text">
-          {{ post.text }}
-        </p>
+        <div v-if="post.title" class="text-xl font-bold text-[var(--text-primary)] mb-2 font-display">
+          {{ post.title }}
+        </div>
         <div class="entry-actions">
-          <div class="action-btn" @click="(e) => handleLike(e, post)">
-            <div class="i-mdi-heart-outline"></div>
+          <div class="action-btn" :class="{ '!text-[var(--accent)]': post.liked }" @click="(e) => handleLike(e, post)">
+            <div :class="post.liked ? 'i-mdi-heart' : 'i-mdi-heart-outline'"></div>
             <span>{{ post.likes }}</span>
           </div>
           <div class="action-btn">
@@ -110,7 +148,9 @@ function getContrastColor(hexColor) {
       </div>
     </div>
 
-    <PostModal :post="selectedPost" @close="closePost" />
+    <PostModal :post="selectedPost" @close="closePost" @deleted="handlePostDeleted" @edit="handleEditPost" />
+    <CreatePostModal v-if="showCreateModal" :post="postToEdit" @close="handleCreateModalClose"
+      @created="handlePostCreated" @updated="handlePostCreated" />
   </div>
 </template>
 
@@ -249,5 +289,39 @@ function getContrastColor(hexColor) {
 
 .action-btn:hover {
   color: var(--accent);
+}
+
+.neo-btn-sm {
+  background: var(--bg-card);
+  border: 2px solid var(--border-color);
+  color: var(--text-primary);
+  padding: 0.2rem 0.6rem;
+  border-radius: 6px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: transform 0.1s;
+  display: flex;
+  align-items: center;
+}
+
+.neo-btn-sm:active {
+  transform: translateY(1px);
+}
+
+.markdown-body :deep(p) {
+  margin-bottom: 0.5rem;
+}
+
+.markdown-body :deep(a) {
+  color: var(--accent);
+  text-decoration: underline;
+}
+
+.markdown-body :deep(strong) {
+  font-weight: 800;
+}
+
+.markdown-body :deep(em) {
+  font-style: italic;
 }
 </style>

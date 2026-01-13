@@ -150,3 +150,59 @@ export async function likePost(id) {
     if (!res.ok) throw new Error('Failed to like post');
     return res.json();
 }
+
+export async function addPostComment(id, text, user) {
+    const res = await fetch(`${API_BASE}/posts/${id}/comments`, {
+        method: 'POST',
+        headers: getHeaders(),
+        body: JSON.stringify({ text, user })
+    });
+    if (!res.ok) throw new Error('Failed to comment on post');
+    return res.json();
+}
+
+export async function deletePostComment(commentId) {
+    const res = await fetch(`${API_BASE}/posts/comments/${commentId}`, {
+        method: 'DELETE',
+        headers: getHeaders()
+    });
+    if (!res.ok) throw new Error('Failed to delete comment');
+    return res.json();
+}
+
+export async function likePostComment(commentId) {
+    const res = await fetch(`${API_BASE}/posts/comments/${commentId}/like`, {
+        method: 'POST',
+        headers: getHeaders()
+    });
+    if (!res.ok) throw new Error('Failed to like comment');
+    return res.json();
+}
+export async function createPost(postData) {
+    const res = await fetch(`${API_BASE}/posts`, {
+        method: 'POST',
+        headers: getHeaders(),
+        body: JSON.stringify(postData)
+    });
+    if (!res.ok) throw new Error('Failed to create post');
+    return res.json();
+}
+
+export async function updatePost(id, postData) {
+    const res = await fetch(`${API_BASE}/posts/${id}`, {
+        method: 'PATCH',
+        headers: getHeaders(),
+        body: JSON.stringify(postData)
+    });
+    if (!res.ok) throw new Error('Failed to update post');
+    return res.json();
+}
+
+export async function deletePost(id) {
+    const res = await fetch(`${API_BASE}/posts/${id}`, {
+        method: 'DELETE',
+        headers: getHeaders()
+    });
+    if (!res.ok) throw new Error('Failed to delete post');
+    return res.json();
+}

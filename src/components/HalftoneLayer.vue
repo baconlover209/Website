@@ -26,8 +26,8 @@ const mouseStyle = computed(() => ({
   <div class="halftone-wrapper" :class="mode" :style="mouseStyle">
     <!-- map (noise/gradient) -->
     <div class="halftone-content">
+      <WaveCanvas />
       <NoiseCanvas v-if="mode === 'idle'" />
-      <WaveCanvas v-else />
       <div class="dot-grid"></div>
     </div>
 

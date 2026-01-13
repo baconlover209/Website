@@ -1,6 +1,6 @@
 <script setup>
 import { ref, onMounted, onUnmounted } from "vue";
-import normal from "./normal.vue";
+import Normal from "./Normal.vue";
 
 const props = defineProps({
   isSlideshowActive: Boolean,

@@ -36,6 +36,7 @@ onUnmounted(() => {
   image-rendering: pixelated;
   filter: blur(2px) brightness(85%) contrast(150%) brightness(120%);
   /* slight blur to avoid map clipping artifacts from pixelation blocks */
+  mix-blend-mode: multiply;
   opacity: 1;
   object-fit: cover;
   display: block;
