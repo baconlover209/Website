@@ -2,10 +2,16 @@
 import { ref, computed, onMounted } from "vue";
 import { fetchArt } from "@/utils/fetchArt";
 import HalftoneLayer from "@/components/HalftoneLayer.vue";
+import ImageView from "@/components/modals/ImageView.vue";
 import { hueShift } from "@/utils/hue";
 
 const lx = ref("50%");
 const ly = ref("50%");
+
+const selectedImage = ref(null);
+const openImage = (url) => {
+  selectedImage.value = { img: url };
+};
 
 const selectedStyle = ref("Cell");
 
@@ -96,7 +102,8 @@ async function handleFeaturedBadgeClick() {
               borderColor: currentStyleData.color,
               '--tint': currentStyleData.color,
             }">
-              <img :src="currentStyleData.art" class="art-image" :alt="selectedStyle" decoding="sync" loading="eager" />
+              <img :src="currentStyleData.art" class="art-image cursor-pointer" :alt="selectedStyle" decoding="sync"
+                loading="eager" @click="openImage(currentStyleData.art)" />
               <span class="label-bottom">{{ selectedStyle }} Style</span>
             </div>
           </transition>
@@ -148,8 +155,8 @@ async function handleFeaturedBadgeClick() {
     <h2 class="anim-title">Backgrounds</h2>
     <div class="middle-grid">
       <div v-for="bg in backgrounds" :key="bg.name" class="grid-item">
-        <div class="item-square hover-subtle">
-          <img :src="bg.img" class="grid-img" :alt="bg.name" />
+        <div class="item-square hover-subtle" @click="openImage(bg.img)">
+          <img :src="bg.img" class="grid-img cursor-pointer" :alt="bg.name" />
         </div>
         <div class="item-caption">{{ bg.name }} — {{ bg.price }}</div>
       </div>
@@ -192,11 +199,15 @@ async function handleFeaturedBadgeClick() {
               pointerEvents: idx === paintingStack.length - 1 ? 'auto' : 'none',
             }">
             <img :src="img" class="spread-img" alt="Commission example" />
+            <div class="maximize-btn" @click.stop="openImage(img)" title="View Fullscreen">
+              <div class="i-fa6-solid-expand text-xl"></div>
+            </div>
           </div>
         </transition-group>
         <div class="spread-hint">CLICK TO FLIP THROUGH</div>
       </div>
     </div>
+    <ImageView :image="selectedImage" @close="selectedImage = null" />
   </div>
 </template>
 
@@ -603,6 +614,34 @@ async function handleFeaturedBadgeClick() {
   object-fit: cover;
   pointer-events: none;
   image-rendering: auto;
+}
+
+.maximize-btn {
+  position: absolute;
+  bottom: 15px;
+  right: 15px;
+  background: transparent;
+  color: var(--text-muted);
+  border-radius: 8px;
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  transition: all 0.2s ease;
+  pointer-events: auto;
+  cursor: pointer;
+}
+
+.photo-wrap:hover .maximize-btn {
+  opacity: 1;
+}
+
+.maximize-btn:hover {
+  background: rgba(0, 0, 0, 0.05);
+  color: var(--accent);
+  transform: scale(1.1);
 }
 
 .photo-wrap.is-top:hover {

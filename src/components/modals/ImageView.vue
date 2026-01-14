@@ -1,4 +1,3 @@
-nsvklh
 <script setup>
 defineProps({
     image: {
