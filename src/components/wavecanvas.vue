@@ -228,8 +228,8 @@ function tryInitWebGL() {
     };
 }
 
-/* ================================================= fallback (unchanged) */
-function startFallback() { /* (same as before, omitted for brevity) */
+/* ================================================= fallback */
+function startFallback() {
     const canvas = canvasRef.value, ctx = canvas.getContext("2d");
     const ripples = [], DPR = () => window.devicePixelRatio || 1;
     const SPEED = 1.5, FADE = 0.02, WIDTH = 18, START = 0.5;
@@ -280,9 +280,7 @@ onUnmounted(() => { destroyFn?.(); resizeObs?.disconnect(); });
     height: 100%;
     display: block;
     object-fit: cover;
-    /* Keep a little blur so rings are soft; match the styling philosophy of NoiseCanvas */
     filter: blur(10px) invert(1) brightness(200%);
-    /* No pixelated scaling: we want smooth waves */
     image-rendering: auto;
 }
 </style>

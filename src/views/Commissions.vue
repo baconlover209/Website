@@ -108,7 +108,8 @@ async function handleFeaturedBadgeClick() {
               <div ref="logoMark" class="logo-mark animated-halftone" @mousemove="handleLogoMouse"
                 @click="handleFeaturedBadgeClick">
                 <HalftoneLayer class="halftone-idle" mode="idle" dot-size="33.33%" />
-                <HalftoneLayer class="halftone-hover" mode="mouse" :x="lx" :y="ly" dot-size="33.33%" />
+                <HalftoneLayer class="halftone-hover" mode="mouse" :x="lx" :y="ly" dot-size="33.33%" :use-wave="false"
+                  :use-gradient="true" />
 
                 <div style="position: relative; z-index: 1">
                   <div class="text-3xl text-white"></div>
@@ -222,7 +223,7 @@ async function handleFeaturedBadgeClick() {
 
 .hero-layout {
   display: grid;
-  grid-template-columns: 420px 1fr;
+  grid-template-columns: minmax(300px, 420px) 1fr;
   padding: 2.5rem;
   gap: 2.5rem;
   min-height: 500px;
@@ -267,6 +268,7 @@ async function handleFeaturedBadgeClick() {
 .info-container {
   display: flex;
   flex-direction: column;
+  min-width: 0;
 }
 
 .logo-mark {
@@ -281,6 +283,7 @@ async function handleFeaturedBadgeClick() {
   border: 3px solid var(--border-color);
   box-shadow: 4px 4px 0px 0px var(--border-color);
   box-sizing: content-box;
+  flex-shrink: 0;
 }
 
 .header-block {
@@ -291,14 +294,16 @@ async function handleFeaturedBadgeClick() {
   display: flex;
   align-items: center;
   gap: 1.5rem;
+  flex-wrap: wrap;
 }
 
 .title-main {
-  font-size: 4rem;
+  font-size: clamp(2.5rem, 5vw, 4rem);
   font-weight: 900;
   text-transform: uppercase;
   line-height: 0.8;
   letter-spacing: -0.04em;
+  word-break: break-word;
 }
 
 .header-line {
@@ -310,7 +315,7 @@ async function handleFeaturedBadgeClick() {
 
 .pricing-matrix {
   display: grid;
-  grid-template-columns: 160px 1fr;
+  grid-template-columns: minmax(140px, 160px) 1fr;
   gap: 1.5rem;
   flex: 1;
 }
@@ -481,11 +486,11 @@ async function handleFeaturedBadgeClick() {
 
 .anim-lines {
   font-weight: 500;
-  font-size: 1.2rem;
+  font-size: clamp(0.85rem, 5.5cqw, 1.2rem);
   color: var(--text-secondary);
   display: flex;
   flex-direction: column;
-  gap: 0.6rem;
+  gap: clamp(0.3rem, 2cqw, 0.6rem);
   overflow-wrap: break-word;
 }
 
@@ -496,18 +501,28 @@ async function handleFeaturedBadgeClick() {
 }
 
 .painting-layout {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
   gap: 5rem;
   padding-bottom: 6rem;
+  container-type: inline-size;
+}
+
+.painting-info {
+  flex: 1 1 400px;
+  container-type: inline-size;
+  min-width: 0;
 }
 
 .title-huge {
-  font-size: 5rem;
+  font-size: clamp(3rem, 15cqw, 6rem);
   font-weight: 900;
   text-transform: uppercase;
   line-height: 0.8;
   margin-bottom: 2.5rem;
+  word-break: break-word;
 }
 
 .text-pop {
@@ -522,14 +537,14 @@ async function handleFeaturedBadgeClick() {
 }
 
 .detail-item {
-  font-size: 1.3rem;
+  font-size: clamp(1rem, 5cqw, 1.5rem);
   font-weight: 800;
   color: var(--text-muted);
   text-transform: uppercase;
 }
 
 .painting-price {
-  font-size: 2.2rem;
+  font-size: clamp(1.5rem, 8cqw, 2.5rem);
   font-weight: 900;
   color: var(--accent);
   margin-top: 1.25rem;
@@ -539,6 +554,7 @@ async function handleFeaturedBadgeClick() {
   height: 12px;
   background: var(--text-primary);
   margin-bottom: 1.25rem;
+  max-width: 100%;
 }
 
 .short {
@@ -550,9 +566,11 @@ async function handleFeaturedBadgeClick() {
 }
 
 .photo-deck {
+  flex: 1 1 400px;
   position: relative;
   height: 400px;
-  width: 500px;
+  width: 100%;
+  max-width: 500px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -562,7 +580,8 @@ async function handleFeaturedBadgeClick() {
 
 .photo-wrap {
   position: absolute;
-  width: 400px;
+  width: 100%;
+  max-width: 400px;
   height: 340px;
   padding: 12px 12px 60px 12px;
   background: white;
@@ -594,12 +613,14 @@ async function handleFeaturedBadgeClick() {
 
 .spread-hint {
   position: absolute;
-  bottom: -25px;
+  bottom: -75px;
   font-weight: 900;
   font-size: 0.85rem;
   letter-spacing: 0.2em;
   color: var(--text-secondary);
   opacity: 1;
+  text-align: center;
+  width: 100%;
 }
 
 .deck-flip-leave-active {
@@ -705,8 +726,7 @@ async function handleFeaturedBadgeClick() {
   }
 
   .painting-layout {
-    grid-template-columns: 1fr;
-    gap: 4rem;
+    gap: 3rem;
   }
 
   .photo-deck {
@@ -714,7 +734,7 @@ async function handleFeaturedBadgeClick() {
   }
 }
 
-@media (max-width: 1250px) {
+@media (max-width: 1454px) {
   .middle-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: 1.5rem;
@@ -729,7 +749,7 @@ async function handleFeaturedBadgeClick() {
   }
 }
 
-@media (max-width: 850px) {
+@media (max-width: 915px) {
   .commissions-view {
     padding: 1.5rem;
     gap: 2rem;
@@ -795,8 +815,9 @@ async function handleFeaturedBadgeClick() {
   }
 
   .photo-wrap {
-    width: 300px;
-    height: 250px;
+    width: 100%;
+    max-width: 400px;
+    height: 340px;
     padding: 8px 8px 45px 8px;
   }
 }

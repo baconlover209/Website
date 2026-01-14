@@ -12,6 +12,8 @@ const props = defineProps({
   y: { type: String, default: "50%" },
   maskStop: { type: String, default: "0%" },
   dotSize: { type: String, default: "1em" },
+  useWave: { type: Boolean, default: true },
+  useGradient: { type: Boolean, default: false },
 });
 
 const mouseStyle = computed(() => ({
@@ -26,7 +28,8 @@ const mouseStyle = computed(() => ({
   <div class="halftone-wrapper" :class="mode" :style="mouseStyle">
     <!-- map (noise/gradient) -->
     <div class="halftone-content">
-      <WaveCanvas />
+      <WaveCanvas v-if="useWave" />
+      <div v-if="mode === 'mouse' && useGradient" class="mouse-gradient"></div>
       <NoiseCanvas v-if="mode === 'idle'" />
       <div class="dot-grid"></div>
     </div>

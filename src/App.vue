@@ -16,8 +16,8 @@ const navLinks = [
   { name: "Home", path: "/" },
   { name: "Projects", path: "/projects" },
   { name: "Gallery", path: "/gallery" },
-  { name: "Comms", path: "/commissions" },
   { name: "Queue", path: "/queue" },
+  { name: "Comms", path: "/commissions" },
 ];
 
 const route = useRoute();
@@ -112,7 +112,7 @@ onUnmounted(() => {
     <div class="main-container">
       <aside class="left-column" :class="{ 'expanded-halftone': isSlideshowActive }">
         <div class="sidebar-header animated-halftone" @click="toggleSlideshow" style="cursor: pointer"
-          title="Toggle Relax Mode">
+          title="Relax Mode">
           <div class="inner-glow"></div>
           <HalftoneLayer class="halftone-idle" mode="idle" :mask-stop="isSlideshowActive ? '-50%' : '0%'">
           </HalftoneLayer>
@@ -183,9 +183,6 @@ onUnmounted(() => {
   --halftone-dot-light: 50%;
 
   --halftone-dot-color: hsl(var(--halftone-dot-hue) var(--halftone-dot-sat) var(--halftone-dot-light) / 1);
-
-
-  /* Everything else unchanged */
 
   --bg-primary: #f1f5f9;
 
@@ -263,9 +260,6 @@ onUnmounted(() => {
 
   --halftone-dot-color: hsl(var(--halftone-dot-hue) var(--halftone-dot-sat) var(--halftone-dot-light) / 1);
 
-
-  /* Everything else unchanged */
-
   --bg-primary: #020617;
 
   --bg-sidebar: #020617;
@@ -320,6 +314,14 @@ body {
   color: var(--text-primary);
 }
 
+img.emoji {
+  height: 1em;
+  width: 1em;
+  margin: 0 .05em 0 .1em;
+  vertical-align: -0.1em;
+  display: inline-block;
+}
+
 @property --mask-stop {
   syntax: "<percentage>";
   initial-value: 0%;
@@ -347,10 +349,18 @@ body {
 .nav-links {
   flex: 1;
   display: flex;
+  overflow-x: auto;
+  overflow-y: hidden;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+}
+
+.nav-links::-webkit-scrollbar {
+  display: none;
 }
 
 .nav-item {
-  flex: 1;
+  flex: 1 0 auto;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -628,6 +638,18 @@ body {
   .nav-item {
     font-size: 0.9rem;
     padding: 0 0.5rem;
+  }
+}
+
+@media (max-width: 600px) {
+  .nav-item {
+    font-size: 0.75rem;
+    padding: 0 0.25rem;
+    flex: 1 1 auto;
+  }
+
+  .nav-logo {
+    min-width: 50px;
   }
 }
 </style>

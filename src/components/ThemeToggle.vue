@@ -118,4 +118,15 @@ onMounted(() => {
 .dark .theme-toggle-btn:hover .toggle-track {
     border-color: white;
 }
+
+@media (max-width: 600px) {
+    .toggle-track {
+        display: none;
+    }
+
+    .theme-toggle-btn {
+        gap: 0;
+        padding: 0.2rem;
+    }
+}
 </style>

@@ -4,6 +4,7 @@ import PostModal from "./modals/PostModal.vue";
 import CreatePostModal from "./modals/CreatePostModal.vue";
 import { fetchPosts, likePost, isUserAdmin } from "@/utils/api";
 import { getRelativeTime } from "../utils/time";
+import { getEmojiHtml } from "../utils/emoji";
 import snarkdown from 'snarkdown';
 
 const navLinks = ["Twitter", "Bluesky", "Kofi", "discord"];
@@ -62,7 +63,7 @@ function getContrastColor(hexColor) {
 
 function parseMarkdown(text) {
   if (!text) return '';
-  return snarkdown(text.replace(/\n/g, '\n\n'));
+  return snarkdown(getEmojiHtml(text).replace(/\n/g, '\n\n'));
 }
 
 function handlePostCreated() {
@@ -128,8 +129,8 @@ function handleCreateModalClose() {
             {{ post.mood }}
           </div>
         </div>
-        <div v-if="post.title" class="text-xl font-bold text-[var(--text-primary)] mb-2 font-display">
-          {{ post.title }}
+        <div v-if="post.title" class="text-xl font-bold text-[var(--text-primary)] mb-2 font-display"
+          v-html="getEmojiHtml(post.title)">
         </div>
         <div class="entry-actions">
           <div class="action-btn" :class="{ '!text-[var(--accent)]': post.liked }" @click="(e) => handleLike(e, post)">

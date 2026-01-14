@@ -2,6 +2,7 @@
 import { ref } from 'vue';
 import { getRelativeTime } from "../../utils/time";
 import { likePost, addPostComment, deletePostComment, likePostComment, deletePost, isUserAdmin } from "../../utils/api";
+import { parseMessage, getEmojiHtml } from "../../utils/emoji";
 import snarkdown from 'snarkdown';
 
 const props = defineProps({
@@ -70,7 +71,7 @@ async function handleDeleteComment(commentId) {
 
 function parseMarkdown(text) {
     if (!text) return '';
-    return snarkdown(text.replace(/\n/g, '\n\n'));
+    return snarkdown(getEmojiHtml(text).replace(/\n/g, '\n\n'));
 }
 
 async function handleDeletePost() {
@@ -137,8 +138,8 @@ function handleEditPost() {
                             <span class="text-[var(--accent)] uppercase"> {{ post.mood }}</span>
                         </div>
 
-                        <div v-if="post.title" class="text-2xl font-bold text-[var(--text-primary)] mb-4 font-display">
-                            {{ post.title }}
+                        <div v-if="post.title" class="text-2xl font-bold text-[var(--text-primary)] mb-4 font-display"
+                            v-html="getEmojiHtml(post.title)">
                         </div>
 
                         <div class="text-xl font-medium leading-snug text-[var(--text-primary)] mb-6 markdown-body"
@@ -168,7 +169,7 @@ function handleEditPost() {
                                                 <span
                                                     class="w-1 h-1 rounded-full bg-[var(--text-muted)] opacity-50"></span>
                                                 <span class="font-normal opacity-70">{{ getRelativeTime(comment.time)
-                                                    }}</span>
+                                                }}</span>
                                             </div>
                                             <button
                                                 class="bg-transparent border-none p-0 cursor-pointer text-[var(--text-secondary)] hover:text-red-500 transition-colors opacity-0 group-hover:opacity-60 hover:!opacity-100"
@@ -178,8 +179,12 @@ function handleEditPost() {
                                         </div>
 
                                         <div
-                                            class="text-sm font-medium text-[var(--text-primary)] leading-snug mb-2 pl-0.5">
-                                            {{ comment.text }}
+                                            class="text-sm font-medium text-[var(--text-primary)] leading-snug mb-2 pl-0.5 flex flex-wrap items-center gap-0.5">
+                                            <template v-for="(token, tIdx) in parseMessage(comment.text)" :key="tIdx">
+                                                <span v-if="token.type === 'text'">{{ token.content }}</span>
+                                                <img v-else :src="token.src" :alt="token.alt"
+                                                    class="w-5 h-5 inline-block" />
+                                            </template>
                                         </div>
 
                                         <div class="flex items-center justify-end">

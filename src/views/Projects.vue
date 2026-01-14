@@ -1,6 +1,7 @@
 <script setup>
 import { ref, onMounted } from "vue";
 import { fetchProjects, createProject, deleteProject, isUserAdmin } from "@/utils/api";
+import { getEmojiHtml } from "@/utils/emoji";
 import NewProjectModal from "@/components/modals/NewProjectModal.vue";
 
 const projects = ref([]);
@@ -68,7 +69,7 @@ async function handleDeleteProject(id) {
                     <div class="content-header">
                         <div class="title-row">
                             <a :href="project.link" target="_blank" class="project-link">
-                                <h2 class="project-title">{{ project.title }}</h2>
+                                <h2 class="project-title" v-html="getEmojiHtml(project.title)"></h2>
                             </a>
                             <button v-if="isUserAdmin" class="delete-btn" @click="handleDeleteProject(project.id)">
                                 TRASH
@@ -76,7 +77,7 @@ async function handleDeleteProject(id) {
                         </div>
                         <div class="title-underline"></div>
                     </div>
-                    <p class="project-desc">{{ project.description }}</p>
+                    <p class="project-desc" v-html="getEmojiHtml(project.description)"></p>
                 </div>
             </div>
             <div class="section-divider"></div>
