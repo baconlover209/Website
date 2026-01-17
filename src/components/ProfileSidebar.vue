@@ -2,8 +2,11 @@
 import { ref, onMounted, onUnmounted } from "vue";
 import Normal from "./Normal.vue";
 
+import pfpUrl from "../assets/pfp.webp";
+
 const props = defineProps({
   isSlideshowActive: Boolean,
+  isMobile: Boolean,
 });
 
 const card = ref(null);
@@ -52,8 +55,11 @@ const formatDate = (date) => {
     <div class="identity-wrapper" :class="{ 'slideshow-active': isSlideshowActive }">
       <transition name="fade">
         <div v-show="!isSlideshowActive" class="profile-content">
-          <div ref="card" class="avatar-frame" @mousemove="handleMouseMove">
-            <normal normal-img="normal.png" diffuse-img="pfp.webm" />
+          <div v-if="isMobile" class="avatar-frame">
+            <img :src="pfpUrl" alt="Profile" class="avatar-img" />
+          </div>
+          <div v-else ref="card" class="avatar-frame" @mousemove="handleMouseMove">
+            <normal normal-img="normal.webp" diffuse-img="pfp.webm" />
           </div>
           <h1 class="name-title">DART</h1>
         </div>
@@ -199,8 +205,8 @@ const formatDate = (date) => {
   }
 
   .avatar-frame {
-    width: 70px;
-    height: 70px;
+    width: 60px;
+    height: 60px;
     border-width: 3px;
   }
 

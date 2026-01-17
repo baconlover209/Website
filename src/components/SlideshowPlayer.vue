@@ -167,6 +167,7 @@ const offset = computed(
   display: flex;
   align-items: center;
   justify-content: center;
+  z-index: 1;
 }
 
 .ambient-bg {
@@ -187,7 +188,7 @@ const offset = computed(
   position: relative;
   width: 100%;
   height: 100%;
-  z-index: 1;
+  z-index: 2;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -201,6 +202,7 @@ const offset = computed(
   align-items: center;
   justify-content: center;
   position: relative;
+  z-index: 5;
 }
 
 .image-wrapper {

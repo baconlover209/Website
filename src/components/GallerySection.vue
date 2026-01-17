@@ -2,20 +2,89 @@
 import artUrl from "../assets/character.webp";
 import ImageView from "@/components/modals/ImageView.vue";
 import { fetchArt } from "@/utils/fetchArt";
-import { onMounted, ref } from "vue";
+import { onMounted, onUnmounted, ref } from "vue";
 
 const galleryItems = ref([]);
+const featuredImage = ref({ img: artUrl, name: 'Featured' });
+
+const thumbnailsRow = ref(null);
+const isPaused = ref(false);
+let animationFrameId;
+let pauseTimeout;
+
+const scrollAccumulator = ref(0);
+
+const SCROLL_SPEED = 0.27;
+
+const pickRandomFeatured = async () => {
+  try {
+    const homeData = await fetchArt("big_homepage");
+    if (homeData.pieces && homeData.pieces.length > 0) {
+      const randomIdx = Math.floor(Math.random() * homeData.pieces.length);
+      featuredImage.value = homeData.pieces[randomIdx];
+    }
+  } catch (e) {
+    console.error(e);
+  }
+};
 
 onMounted(async () => {
   try {
-    const data = await fetchArt("homepage");
-    galleryItems.value = data.pieces;
+    pickRandomFeatured();
+
+    const smallData = await fetchArt("homepage");
+    galleryItems.value = [
+      ...smallData.pieces,
+      ...smallData.pieces,
+      ...smallData.pieces,
+      ...smallData.pieces
+    ];
+
+    startAutoScroll();
   } catch (error) {
     console.error("Error loading gallery items:", error);
   }
 });
 
-const featureFullArtRef = "/art/sfdfsdsdfsfdfsvdvds.webp";
+onUnmounted(() => {
+  if (animationFrameId) cancelAnimationFrame(animationFrameId);
+  if (pauseTimeout) clearTimeout(pauseTimeout);
+});
+
+function startAutoScroll() {
+  const scroll = () => {
+    if (thumbnailsRow.value && !isPaused.value) {
+      handleScrollLoop();
+
+      scrollAccumulator.value += SCROLL_SPEED;
+      if (scrollAccumulator.value >= 1) {
+        const wrap = Math.floor(scrollAccumulator.value);
+        thumbnailsRow.value.scrollLeft += wrap;
+        scrollAccumulator.value -= wrap;
+      }
+    }
+    animationFrameId = requestAnimationFrame(scroll);
+  };
+  animationFrameId = requestAnimationFrame(scroll);
+}
+
+function handleScrollLoop() {
+  const el = thumbnailsRow.value;
+  if (!el) return;
+
+  if (el.scrollLeft >= el.scrollWidth / 2) {
+    el.scrollLeft -= el.scrollWidth / 2;
+  }
+}
+
+function onUserInteraction() {
+  isPaused.value = true;
+  if (pauseTimeout) clearTimeout(pauseTimeout);
+
+  pauseTimeout = setTimeout(() => {
+    isPaused.value = false;
+  }, 2000);
+}
 
 function closeImage() {
   selectedImage.value = null;
@@ -32,16 +101,21 @@ const selectedImage = ref(null);
   <div class="h-100%">
     <div class="gallery-layout">
       <div class="feature-box">
-        <img :src="artUrl" class="feature-img" alt="Featured Character Art"
-          @click="openImage({ img: featureFullArtRef })" fetchpriority="high" loading="eager" />
+        <template v-if="featuredImage">
+          <img :src="featuredImage.img" class="feature-bg" alt="" aria-hidden="true" />
+          <img :src="featuredImage.img" class="feature-img" :alt="featuredImage.name" fetchpriority="high"
+            loading="eager" />
+          <div class="interaction-overlay" @click="openImage(featuredImage)"></div>
+        </template>
         <div class="feature-badge">FEATURED</div>
       </div>
 
-      <div class="thumbnails-row overflow-x-scroll hide-scrollbar">
-        <div v-for="(item, index) in galleryItems" :key="item.id" class="thumb-square-link">
-          <div class="thumb-inner flex items-center justify-center">
-            <img :src="item.img" class="thumb-img" :alt="item.name" @click="openImage(item)"
-              :fetchpriority="index < 4 ? 'high' : 'auto'" :loading="index < 4 ? 'eager' : 'lazy'" />
+      <div class="thumbnails-row overflow-x-scroll hide-scrollbar" ref="thumbnailsRow" @pointerdown="onUserInteraction"
+        @touchstart="onUserInteraction" @wheel="onUserInteraction" @scroll="handleScrollLoop">
+        <div v-for="(item, index) in galleryItems" :key="`${item.id}-${index}`" class="thumb-square-link">
+          <div class="thumb-inner flex items-center justify-center" @click="openImage(item)">
+            <img :src="item.img" class="thumb-img" :alt="item.name" :fetchpriority="index < 4 ? 'high' : 'auto'"
+              :loading="index < 4 ? 'eager' : 'lazy'" />
           </div>
         </div>
       </div>
@@ -51,6 +125,13 @@ const selectedImage = ref(null);
 </template>
 
 <style scoped>
+.interaction-overlay {
+  position: absolute;
+  inset: 0;
+  z-index: 5;
+  cursor: pointer;
+}
+
 .gallery-layout {
   display: flex;
   flex-direction: column;
@@ -65,19 +146,43 @@ const selectedImage = ref(null);
   position: relative;
   background: var(--bg-card-alt);
   min-height: 0;
+  overflow: hidden;
+  display: grid;
+  place-items: center;
 }
 
-.feature-img {
+.feature-bg {
+  position: absolute;
+  inset: 0;
   width: 100%;
   height: 100%;
   object-fit: cover;
+  filter: blur(20px) brightness(0.7);
+  transform: scale(1.1);
+  z-index: 0;
+  pointer-events: none;
+}
+
+.feature-img {
+  position: absolute;
+  z-index: 1;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
   display: block;
+  pointer-events: none;
+  transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.feature-box:hover .feature-img {
+  transform: scale(1.02);
 }
 
 .feature-badge {
   position: absolute;
   top: 1rem;
   left: 1rem;
+  z-index: 1;
   background: var(--badge-bg);
   color: var(--badge-text);
   padding: 0.5rem 1rem;
@@ -85,7 +190,6 @@ const selectedImage = ref(null);
   font-family: "Outfit", sans-serif;
   border-radius: 4px;
   overflow: hidden;
-  position: absolute;
   transform: translate(0, 0px);
   transition: transform 0.5s cubic-bezier(0.075, 0.82, 0.165, 1);
 }
@@ -124,13 +228,13 @@ const selectedImage = ref(null);
 }
 
 .thumb-square-link {
-  aspect-ratio: 1/1;
   height: 100%;
   border: 4px solid var(--border-color);
   background: var(--bg-card);
   padding: 4px;
   cursor: pointer;
   transition: transform 0.2s, background 0.2s;
+  flex: 0 0 auto;
 }
 
 .thumb-square-link:hover {
@@ -139,18 +243,21 @@ const selectedImage = ref(null);
 }
 
 .thumb-img {
-  width: 100%;
+  width: auto;
   height: 100%;
-  object-fit: cover;
+  object-fit: contain;
   display: block;
+  pointer-events: none;
 }
 
 .thumb-inner {
-  width: 100%;
+  width: auto;
   height: 100%;
   border: 2px solid var(--border-color);
   background: var(--bg-card-alt);
   overflow: hidden;
+  display: flex;
+  justify-content: center;
 }
 
 .hide-scrollbar::-webkit-scrollbar {

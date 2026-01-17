@@ -36,12 +36,28 @@ function updateGlobalMouse(e) {
   document.documentElement.style.setProperty("--my", my.value);
 }
 
+const isMobile = ref(false);
+
+const checkMobile = () => {
+  isMobile.value = window.innerWidth <= 850;
+};
+
 const toggleSlideshow = () => {
   isSlideshowActive.value = !isSlideshowActive.value;
 };
 
 onMounted(async () => {
+  checkMobile();
+  window.addEventListener("resize", checkMobile);
   window.addEventListener("mousemove", updateGlobalMouse);
+
+  if (isMobile.value) {
+    if (route.path === '/') {
+      isMobileBioOpen.value = true;
+    } else {
+      isMobileBioOpen.value = false;
+    }
+  }
 
   const query = route.query;
   if (query.key && query.id) {
@@ -80,9 +96,13 @@ onMounted(async () => {
 
 watch(
   () => route.path,
-  () => {
-    isMobileBioOpen.value = false;
+  (newPath) => {
     isSlideshowActive.value = false;
+    if (isMobile.value) {
+      isMobileBioOpen.value = (newPath === '/');
+    } else {
+      isMobileBioOpen.value = false;
+    }
   }
 );
 
@@ -92,6 +112,7 @@ document.documentElement.style.setProperty("--halftone-dot-hue", `calc(180deg + 
 
 onUnmounted(() => {
   window.removeEventListener("mousemove", updateGlobalMouse);
+  window.removeEventListener("resize", checkMobile);
 });
 </script>
 
@@ -111,16 +132,16 @@ onUnmounted(() => {
 
     <div class="main-container">
       <aside class="left-column" :class="{ 'expanded-halftone': isSlideshowActive }">
-        <div class="sidebar-header animated-halftone" @click="toggleSlideshow" style="cursor: pointer"
-          title="Relax Mode">
+        <div class="sidebar-header animated-halftone" @click="toggleSlideshow" style="cursor: pointer" title="">
           <div class="inner-glow"></div>
-          <HalftoneLayer class="halftone-idle" mode="idle" :mask-stop="isSlideshowActive ? '-50%' : '0%'">
+          <HalftoneLayer class="halftone-idle" mode="idle" :mask-stop="isSlideshowActive ? '-50%' : '0%'"
+            :use-wave="!isMobile">
           </HalftoneLayer>
           <HalftoneLayer class="halftone-hover" mode="mouse" :x="mx" :y="my"
-            :mask-stop="isSlideshowActive ? '-50%' : '0%'" />
+            :mask-stop="isSlideshowActive ? '-50%' : '0%'" :use-wave="!isMobile" />
 
           <div class="sidebar-content-wrapper" :class="{ 'full-height': isSlideshowActive }">
-            <ProfileSidebar :is-slideshow-active="isSlideshowActive" />
+            <ProfileSidebar :is-slideshow-active="isSlideshowActive" :is-mobile="isMobile" />
           </div>
           <button class="mobile-bio-toggle" @click.stop="isMobileBioOpen = !isMobileBioOpen" aria-label="Toggle Bio">
             <div class="icon-toggle" :class="isMobileBioOpen ? 'i-mdi-chevron-up' : 'i-mdi-chevron-down'
@@ -585,8 +606,9 @@ img.emoji {
   }
 
   .sidebar-header {
-    padding: 0.75rem;
-    height: 100px;
+    padding: 0.5rem;
+    height: 80px;
+    min-height: 0;
     display: flex;
     justify-content: center;
     align-items: center;

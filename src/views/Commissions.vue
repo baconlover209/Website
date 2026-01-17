@@ -13,14 +13,14 @@ const openImage = (url) => {
   selectedImage.value = { img: url };
 };
 
-const selectedStyle = ref("Cell");
+const selectedStyle = ref("Full");
 
 const pricing = {
   styles: [
     { name: "Sketch", color: "#94a3b8", art: "/art/bedrot.webp" },
-    { name: "Flat", color: "#60a5fa", art: "/art/fdsdffdfd.webp" },
-    { name: "Cell", color: "#00CCFF", art: "/art/limebih.webp" },
-    { name: "Full", color: "#f59e0b", art: "/art/wdwdwddwfgghhh.webp" },
+    { name: "Flat", color: "#ffd43b", art: "/art/linus.webp" },
+    { name: "Cell", color: "#5ffcfa", art: "/art/prototcope.webp" },
+    { name: "Full", color: "#91e0c2", art: "/art/limebih.webp" },
   ],
   crops: [
     { name: "Head", basePrice: 5 },
@@ -65,9 +65,9 @@ const currentStyleData = computed(() =>
 );
 
 const backgrounds = [
-  { name: "Simple", price: "Free", img: "/art/EVIL2.webp" },
-  { name: "Abstract", price: "$5", img: "/art/sfdfsdsdfsfdfsvdvds.webp" },
-  { name: "Scene", price: "$10", img: "/art/2323e.webp" },
+  { name: "Simple", price: "Free", img: "/art/westy.webp" },
+  { name: "Abstract", price: "$5", img: "/art/moffman.webp" },
+  { name: "Scene", price: "$10", img: "/art/sdrgdfgsgfddfgdfg.webp" },
 ];
 
 const logoMark = ref(null);
@@ -259,6 +259,7 @@ async function handleFeaturedBadgeClick() {
   width: 100%;
   height: 100%;
   object-fit: cover;
+  aspect-ratio: 1;
 }
 
 .label-bottom {
