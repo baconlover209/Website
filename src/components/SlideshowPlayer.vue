@@ -17,12 +17,22 @@ const isPaused = ref(false);
 const progress = ref(0);
 const duration = 30000;
 
-const slideshowPieces = computed(() => {
-  if (!props.allPieces || !props.slideshowIds) return [];
-  return props.allPieces.filter((piece) =>
-    props.slideshowIds.includes(parseInt(piece.id, 10))
-  );
-});
+const randomizedPieces = ref([]);
+
+watch(
+  [() => props.allPieces, () => props.slideshowIds],
+  ([newPieces, newIds]) => {
+    if (newPieces && newPieces.length > 0 && newIds && newIds.length > 0) {
+      const pieces = newPieces.filter((piece) =>
+        newIds.includes(parseInt(piece.id, 10))
+      );
+      randomizedPieces.value = [...pieces].sort(() => Math.random() - 0.5);
+    }
+  },
+  { immediate: true }
+);
+
+const slideshowPieces = computed(() => randomizedPieces.value);
 
 const currentPiece = computed(() => {
   if (slideshowPieces.value.length === 0) return null;
@@ -167,7 +177,7 @@ const offset = computed(
   display: flex;
   align-items: center;
   justify-content: center;
-  z-index: 1;
+  z-index: 1000;
 }
 
 .ambient-bg {

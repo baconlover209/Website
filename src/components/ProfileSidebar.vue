@@ -202,16 +202,23 @@ const formatDate = (date) => {
 @media (max-width: 850px) {
   .identity-wrapper {
     gap: 1rem;
+    min-height: 0;
   }
 
   .avatar-frame {
     width: 60px;
     height: 60px;
+    min-width: 60px;
+    min-height: 60px;
     border-width: 3px;
   }
 
   .name-title {
     font-size: 2rem;
+  }
+
+  .time-display {
+    font-size: 2.5rem;
   }
 }
 </style>

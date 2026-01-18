@@ -427,6 +427,10 @@ img.emoji {
   background: var(--bg-primary);
 }
 
+.slideshow-mode .main-container {
+  overflow: hidden !important;
+}
+
 .mobile-bio-toggle {
   display: none;
 }
@@ -605,13 +609,23 @@ img.emoji {
     overflow: visible;
   }
 
+  .slideshow-mode .left-column {
+    flex: 1;
+    min-height: 300px;
+  }
+
   .sidebar-header {
     padding: 0.5rem;
-    height: 80px;
-    min-height: 0;
+    min-height: 80px;
+    height: auto;
     display: flex;
     justify-content: center;
     align-items: center;
+    transition: all 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  .slideshow-mode .sidebar-header {
+    height: 100%;
   }
 
   .sidebar-body {

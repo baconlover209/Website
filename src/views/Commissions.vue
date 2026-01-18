@@ -665,7 +665,7 @@ async function handleFeaturedBadgeClick() {
 
 .deck-flip-leave-active {
   position: absolute;
-  z-index: 150 !important;
+  z-index: 50 !important;
   animation: flip-out 0.4s cubic-bezier(0.23, 1, 0.32, 1);
   pointer-events: none !important;
 }

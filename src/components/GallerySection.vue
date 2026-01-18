@@ -5,7 +5,8 @@ import { fetchArt } from "@/utils/fetchArt";
 import { onMounted, onUnmounted, ref } from "vue";
 
 const galleryItems = ref([]);
-const featuredImage = ref({ img: artUrl, name: 'Featured' });
+const featuredImage = ref(null);
+const isImageLoading = ref(true);
 
 const thumbnailsRow = ref(null);
 const isPaused = ref(false);
@@ -17,20 +18,46 @@ const scrollAccumulator = ref(0);
 const SCROLL_SPEED = 0.27;
 
 const pickRandomFeatured = async () => {
+  isImageLoading.value = true;
   try {
     const homeData = await fetchArt("big_homepage");
     if (homeData.pieces && homeData.pieces.length > 0) {
       const randomIdx = Math.floor(Math.random() * homeData.pieces.length);
-      featuredImage.value = homeData.pieces[randomIdx];
+      const chosenPiece = homeData.pieces[randomIdx];
+
+      const img = new Image();
+      img.src = chosenPiece.img;
+
+      await new Promise((resolve) => {
+        if (img.complete) {
+          resolve();
+        } else {
+          img.onload = resolve;
+          img.onerror = resolve;
+        }
+      });
+
+      featuredImage.value = chosenPiece;
+    } else {
+      featuredImage.value = { img: artUrl, name: 'Featured' };
     }
   } catch (e) {
     console.error(e);
+    featuredImage.value = { img: artUrl, name: 'Featured' };
+  } finally {
+    isImageLoading.value = false;
   }
 };
 
 onMounted(async () => {
   try {
     pickRandomFeatured();
+
+    if (thumbnailsRow.value) {
+      thumbnailsRow.value.addEventListener("wheel", handleWheel, {
+        passive: false,
+      });
+    }
 
     const smallData = await fetchArt("homepage");
     galleryItems.value = [
@@ -49,6 +76,9 @@ onMounted(async () => {
 onUnmounted(() => {
   if (animationFrameId) cancelAnimationFrame(animationFrameId);
   if (pauseTimeout) clearTimeout(pauseTimeout);
+  if (thumbnailsRow.value) {
+    thumbnailsRow.value.removeEventListener("wheel", handleWheel);
+  }
 });
 
 function startAutoScroll() {
@@ -86,6 +116,14 @@ function onUserInteraction() {
   }, 2000);
 }
 
+function handleWheel(event) {
+  if (thumbnailsRow.value) {
+    event.preventDefault();
+    thumbnailsRow.value.scrollLeft += event.deltaY;
+    onUserInteraction();
+  }
+}
+
 function closeImage() {
   selectedImage.value = null;
 }
@@ -101,7 +139,10 @@ const selectedImage = ref(null);
   <div class="h-100%">
     <div class="gallery-layout">
       <div class="feature-box">
-        <template v-if="featuredImage">
+        <div v-if="isImageLoading" class="loader-container">
+          <div class="loader"></div>
+        </div>
+        <template v-else-if="featuredImage">
           <img :src="featuredImage.img" class="feature-bg" alt="" aria-hidden="true" />
           <img :src="featuredImage.img" class="feature-img" :alt="featuredImage.name" fetchpriority="high"
             loading="eager" />
@@ -111,7 +152,7 @@ const selectedImage = ref(null);
       </div>
 
       <div class="thumbnails-row overflow-x-scroll hide-scrollbar" ref="thumbnailsRow" @pointerdown="onUserInteraction"
-        @touchstart="onUserInteraction" @wheel="onUserInteraction" @scroll="handleScrollLoop">
+        @touchstart="onUserInteraction" @scroll="handleScrollLoop">
         <div v-for="(item, index) in galleryItems" :key="`${item.id}-${index}`" class="thumb-square-link">
           <div class="thumb-inner flex items-center justify-center" @click="openImage(item)">
             <img :src="item.img" class="thumb-img" :alt="item.name" :fetchpriority="index < 4 ? 'high' : 'auto'"
@@ -125,6 +166,34 @@ const selectedImage = ref(null);
 </template>
 
 <style scoped>
+.loader-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+  z-index: 1;
+}
+
+.loader {
+  width: 40px;
+  height: 40px;
+  border: 4px solid var(--bg-card-alt);
+  border-top: 4px solid var(--accent);
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  0% {
+    transform: rotate(0deg);
+  }
+
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
 .interaction-overlay {
   position: absolute;
   inset: 0;
