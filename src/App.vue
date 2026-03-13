@@ -396,12 +396,10 @@ img.emoji {
 
 .nav-item:hover {
   background: var(--nav-hover-bg);
-  color: var(--accent);
 }
 
 .nav-active {
   background: var(--nav-active-bg);
-  color: var(--accent);
 }
 
 .nav-logo {

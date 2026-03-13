@@ -36,8 +36,8 @@ import { preloadImages } from "@/utils/preloader";
 onMounted(async () => {
   try {
     // preload static images
-    const styleImages = pricing.styles.map(s => s.art);
-    const bgImages = backgrounds.map(b => b.img);
+    const styleImages = pricing.styles.map((s) => s.art);
+    const bgImages = backgrounds.map((b) => b.img);
     preloadImages([...styleImages, ...bgImages]);
 
     const data = await fetchArt("comm_flipbook");
@@ -85,8 +85,14 @@ async function handleFeaturedBadgeClick() {
   // ease value over .5 seconds
   for (let i = 0; i < 20; i++) {
     hueShift.value = hueShift.value + 1;
-    document.documentElement.style.setProperty("--hue-shift", `${hueShift.value}deg`);
-    document.documentElement.style.setProperty("--halftone-dot-hue", `calc(180deg + ${hueShift.value}deg)`);
+    document.documentElement.style.setProperty(
+      "--hue-shift",
+      `${hueShift.value}deg`
+    );
+    document.documentElement.style.setProperty(
+      "--halftone-dot-hue",
+      `calc(180deg + ${hueShift.value}deg)`
+    );
     await new Promise((resolve) => setTimeout(resolve, 10));
   }
 }
@@ -98,12 +104,22 @@ async function handleFeaturedBadgeClick() {
       <div class="hero-layout">
         <div class="art-container">
           <transition name="fade-up" mode="out-in">
-            <div :key="selectedStyle" class="art-box" :style="{
-              borderColor: currentStyleData.color,
-              '--tint': currentStyleData.color,
-            }">
-              <img :src="currentStyleData.art" class="art-image cursor-pointer" :alt="selectedStyle" decoding="sync"
-                loading="eager" @click="openImage(currentStyleData.art)" />
+            <div
+              :key="selectedStyle"
+              class="art-box"
+              :style="{
+                borderColor: currentStyleData.color,
+                '--tint': currentStyleData.color,
+              }"
+            >
+              <img
+                :src="currentStyleData.art"
+                class="art-image cursor-pointer"
+                :alt="selectedStyle"
+                decoding="sync"
+                loading="eager"
+                @click="openImage(currentStyleData.art)"
+              />
               <span class="label-bottom">{{ selectedStyle }} Style</span>
             </div>
           </transition>
@@ -112,11 +128,26 @@ async function handleFeaturedBadgeClick() {
         <div class="info-container">
           <div class="header-block">
             <div class="header-top">
-              <div ref="logoMark" class="logo-mark animated-halftone" @mousemove="handleLogoMouse"
-                @click="handleFeaturedBadgeClick">
-                <HalftoneLayer class="halftone-idle" mode="idle" dot-size="33.33%" />
-                <HalftoneLayer class="halftone-hover" mode="mouse" :x="lx" :y="ly" dot-size="33.33%" :use-wave="false"
-                  :use-gradient="true" />
+              <div
+                ref="logoMark"
+                class="logo-mark animated-halftone"
+                @mousemove="handleLogoMouse"
+                @click="handleFeaturedBadgeClick"
+              >
+                <HalftoneLayer
+                  class="halftone-idle"
+                  mode="idle"
+                  dot-size="33.33%"
+                />
+                <HalftoneLayer
+                  class="halftone-hover"
+                  mode="mouse"
+                  :x="lx"
+                  :y="ly"
+                  dot-size="33.33%"
+                  :use-wave="false"
+                  :use-gradient="true"
+                />
 
                 <div style="position: relative; z-index: 1">
                   <div class="text-3xl text-white"></div>
@@ -129,20 +160,32 @@ async function handleFeaturedBadgeClick() {
 
           <div class="pricing-matrix">
             <div class="styles-selector">
-              <button v-for="style in pricing.styles" :key="style.name" class="style-btn"
-                :class="{ active: selectedStyle === style.name }" @click="selectedStyle = style.name">
+              <button
+                v-for="style in pricing.styles"
+                :key="style.name"
+                class="style-btn"
+                :class="{ active: selectedStyle === style.name }"
+                @click="selectedStyle = style.name"
+              >
                 {{ style.name }}
                 <div class="btn-shadow"></div>
               </button>
             </div>
 
             <div class="sub-box crops-box">
-              <div v-for="crop in pricing.crops" :key="crop.name" class="crop-row">
+              <div
+                v-for="crop in pricing.crops"
+                :key="crop.name"
+                class="crop-row"
+              >
                 <span class="crop-name">{{ crop.name }}</span>
                 <span class="crop-separator">—</span>
                 <transition name="price-fade" mode="out-in">
-                  <span :key="selectedStyle" class="crop-value text-cyan-shine">{{ getStylePrice(crop.basePrice)
-                  }}</span>
+                  <span
+                    :key="selectedStyle"
+                    class="crop-value text-cyan-shine"
+                    >{{ getStylePrice(crop.basePrice) }}</span
+                  >
                 </transition>
               </div>
             </div>
@@ -178,10 +221,14 @@ async function handleFeaturedBadgeClick() {
         <h2 class="title-huge text-pop">Painting</h2>
         <div class="painting-details">
           <div class="detail-item">✦ Physical Paintings/Drawings</div>
-          <div class="detail-item">✦ Priced on Canvas Size / Painting Detail</div>
+          <div class="detail-item">
+            ✦ Priced on Canvas Size / Painting Detail
+          </div>
           <div class="detail-item">✦ Shipping + High Resolution Photo</div>
           <div class="painting-price">STARTING AT ~$100</div>
-          <div class="detail-item opacity-70">*for letter sized standard painting</div>
+          <div class="detail-item opacity-70">
+            *for letter sized standard painting
+          </div>
         </div>
         <div class="filler-lines">
           <div class="f-line short"></div>
@@ -191,15 +238,25 @@ async function handleFeaturedBadgeClick() {
 
       <div class="photo-deck" @click="shufflePaintings">
         <transition-group name="deck-flip">
-          <div v-for="(img, idx) in paintingStack" :key="img" class="photo-wrap"
-            :class="{ 'is-top': idx === paintingStack.length - 1 }" :style="{
+          <div
+            v-for="(img, idx) in paintingStack"
+            :key="img"
+            class="photo-wrap"
+            :class="{ 'is-top': idx === paintingStack.length - 1 }"
+            :style="{
               zIndex: idx,
-              transform: `rotate(${(idx - (paintingStack.length - 1)) * 3
-                }deg) translateX(${(idx - (paintingStack.length - 1)) * 18}px)`,
+              transform: `rotate(${
+                (idx - (paintingStack.length - 1)) * 3
+              }deg) translateX(${(idx - (paintingStack.length - 1)) * 18}px)`,
               pointerEvents: idx === paintingStack.length - 1 ? 'auto' : 'none',
-            }">
+            }"
+          >
             <img :src="img" class="spread-img" alt="Commission example" />
-            <div class="maximize-btn" @click.stop="openImage(img)" title="View Fullscreen">
+            <div
+              class="maximize-btn"
+              @click.stop="openImage(img)"
+              title="View Fullscreen"
+            >
               <div class="i-fa6-solid-expand text-xl"></div>
             </div>
           </div>
@@ -207,16 +264,34 @@ async function handleFeaturedBadgeClick() {
         <div class="spread-hint">CLICK TO FLIP THROUGH</div>
       </div>
     </div>
+    <div class="section-divider"></div>
+
+    <div class="cta-section">
+      <div class="card-outer cta-card">
+        <div class="cta-content">
+          <h2 class="cta-title">Wanna commission me?</h2>
+          <p class="cta-text">uhh dart can you come up smth to say here</p>
+          <router-link
+            :to="`/commissions/request?style=${selectedStyle}`"
+            class="cta-btn"
+          >
+            Start Commission Request
+            <div class="btn-shadow"></div>
+          </router-link>
+        </div>
+      </div>
+    </div>
+
     <ImageView :image="selectedImage" @close="selectedImage = null" />
   </div>
 </template>
 
 <style scoped>
 .commissions-view {
-  padding: 3rem;
+  padding: 2rem;
   display: flex;
   flex-direction: column;
-  gap: 3.5rem;
+  gap: 2.5rem;
   font-family: "Outfit", sans-serif;
   max-width: 1500px;
   margin: 0 auto;
@@ -235,9 +310,9 @@ async function handleFeaturedBadgeClick() {
 .hero-layout {
   display: grid;
   grid-template-columns: minmax(300px, 420px) 1fr;
-  padding: 2.5rem;
-  gap: 2.5rem;
-  min-height: 500px;
+  padding: 1.5rem;
+  gap: 2rem;
+  min-height: 400px;
 }
 
 .art-box {
@@ -250,9 +325,11 @@ async function handleFeaturedBadgeClick() {
   justify-content: center;
   position: relative;
   overflow: hidden;
-  background: color-mix(in srgb,
-      var(--tint, var(--bg-card-alt)) 15%,
-      var(--bg-card-alt));
+  background: color-mix(
+    in srgb,
+    var(--tint, var(--bg-card-alt)) 15%,
+    var(--bg-card-alt)
+  );
 }
 
 .art-image {
@@ -299,7 +376,7 @@ async function handleFeaturedBadgeClick() {
 }
 
 .header-block {
-  margin-bottom: 2rem;
+  margin-bottom: 1.25rem;
 }
 
 .header-top {
@@ -391,11 +468,11 @@ async function handleFeaturedBadgeClick() {
 
 .crops-box {
   background: var(--bg-card-alt);
-  padding: 2rem;
+  padding: 1.5rem;
   display: flex;
   flex-direction: column;
   justify-content: center;
-  gap: 1.5rem;
+  gap: 1rem;
   border: 4px solid var(--border-color);
 }
 
@@ -403,7 +480,7 @@ async function handleFeaturedBadgeClick() {
   display: grid;
   grid-template-columns: 100px 50px 1fr;
   align-items: center;
-  font-size: 2rem;
+  font-size: 1.9rem;
   font-weight: 900;
   text-transform: uppercase;
 }
@@ -441,7 +518,7 @@ async function handleFeaturedBadgeClick() {
 .middle-grid {
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
-  gap: 2rem;
+  gap: 1.5rem;
 }
 
 .item-square {
@@ -468,7 +545,7 @@ async function handleFeaturedBadgeClick() {
 .item-caption {
   font-weight: 900;
   text-transform: uppercase;
-  font-size: 1.4rem;
+  font-size: 1.35rem;
   color: var(--text-primary);
 }
 
@@ -491,7 +568,6 @@ async function handleFeaturedBadgeClick() {
   font-size: clamp(1.2rem, 11cqw, 2.2rem);
   font-weight: 900;
   text-transform: uppercase;
-  margin-bottom: 1.25rem;
   line-height: 1;
   overflow-wrap: break-word;
 }
@@ -508,7 +584,7 @@ async function handleFeaturedBadgeClick() {
 
 .section-divider {
   border-top: 5px dashed var(--border-color);
-  margin: 1rem 0;
+  margin: 0.5rem 0;
   opacity: 0.2;
 }
 
@@ -517,8 +593,8 @@ async function handleFeaturedBadgeClick() {
   flex-wrap: wrap;
   align-items: center;
   justify-content: center;
-  gap: 5rem;
-  padding-bottom: 6rem;
+  gap: 3rem;
+  padding-bottom: 3rem;
   container-type: inline-size;
 }
 
@@ -529,11 +605,11 @@ async function handleFeaturedBadgeClick() {
 }
 
 .title-huge {
-  font-size: clamp(3rem, 15cqw, 6rem);
+  font-size: clamp(2.5rem, 12cqw, 4.5rem);
   font-weight: 900;
   text-transform: uppercase;
   line-height: 0.8;
-  margin-bottom: 2.5rem;
+  margin-bottom: 1.5rem;
   word-break: break-word;
 }
 
@@ -549,17 +625,17 @@ async function handleFeaturedBadgeClick() {
 }
 
 .detail-item {
-  font-size: clamp(1rem, 5cqw, 1.5rem);
+  font-size: clamp(0.9rem, 4.5cqw, 1.2rem);
   font-weight: 800;
   color: var(--text-muted);
   text-transform: uppercase;
 }
 
 .painting-price {
-  font-size: clamp(1.5rem, 8cqw, 2.5rem);
+  font-size: clamp(1.4rem, 8cqw, 2.3rem);
   font-weight: 900;
   color: var(--accent);
-  margin-top: 1.25rem;
+  margin-top: 1rem;
 }
 
 .f-line {
@@ -580,7 +656,7 @@ async function handleFeaturedBadgeClick() {
 .photo-deck {
   flex: 1 1 400px;
   position: relative;
-  height: 400px;
+  height: 360px;
   width: 100%;
   max-width: 500px;
   display: flex;
@@ -594,7 +670,7 @@ async function handleFeaturedBadgeClick() {
   position: absolute;
   width: 100%;
   max-width: 400px;
-  height: 340px;
+  height: 300px;
   padding: 12px 12px 60px 12px;
   background: white;
   box-shadow: 2px 2px 15px rgba(0, 0, 0, 0.15);
@@ -762,7 +838,7 @@ async function handleFeaturedBadgeClick() {
   }
 
   .art-box {
-    height: 480px;
+    height: 400px;
   }
 
   .painting-layout {
@@ -781,7 +857,7 @@ async function handleFeaturedBadgeClick() {
   }
 
   .title-huge {
-    font-size: 5rem;
+    font-size: 4rem;
   }
 
   .title-main {
@@ -806,7 +882,7 @@ async function handleFeaturedBadgeClick() {
   }
 
   .title-huge {
-    font-size: 4rem;
+    font-size: 3.2rem;
   }
 
   .photo-deck {
@@ -860,5 +936,62 @@ async function handleFeaturedBadgeClick() {
     height: 340px;
     padding: 8px 8px 45px 8px;
   }
+}
+
+.cta-section {
+  padding-bottom: 3rem;
+  display: flex;
+  justify-content: center;
+}
+
+.cta-card {
+  width: 100%;
+  max-width: 800px;
+  padding: 3rem 1.5rem;
+  text-align: center;
+  background: var(--bg-card);
+}
+
+.cta-title {
+  font-size: clamp(2.2rem, 7vw, 3rem);
+  font-weight: 900;
+  text-transform: uppercase;
+  margin-bottom: 1.25rem;
+  line-height: 0.9;
+}
+
+.cta-text {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+  margin-bottom: 1.5rem;
+  max-width: 500px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.cta-btn {
+  position: relative;
+  display: inline-block;
+  padding: 1rem 2.5rem;
+  font-weight: 900;
+  text-transform: uppercase;
+  border: 4px solid var(--border-color);
+  background: var(--accent);
+  color: white;
+  text-decoration: none;
+  font-size: 1.4rem;
+  transition: all 0.2s ease;
+}
+
+.cta-btn:hover {
+  transform: translate(-6px, -6px);
+  filter: brightness(1.1);
+}
+
+.cta-btn:hover .btn-shadow {
+  opacity: 1;
+  transform: translate(6px, 6px);
+  background: black;
 }
 </style>

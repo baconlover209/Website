@@ -206,3 +206,18 @@ export async function deletePost(id) {
     if (!res.ok) throw new Error('Failed to delete post');
     return res.json();
 }
+
+export async function requestCommission(data) {
+    const res = await fetch(`${API_BASE}/commissions/request`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(data)
+    });
+    if (!res.ok) {
+        const errData = await res.json();
+        throw new Error(errData.error || 'Failed to send commission request');
+    }
+    return res.json();
+}
